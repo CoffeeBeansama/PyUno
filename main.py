@@ -14,7 +14,9 @@ class MapTiles(Enum):
 
 class Game:
     def __init__(self):
-        self.window = pg.display.set_mode((700,500))
+
+        width,height = 700,500
+        self.window = pg.display.set_mode((width,height))
     
         self.running = True
         self.FPS = 60
@@ -38,6 +40,10 @@ class Game:
         p2Pos = (287,100)
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
+
+
+        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height))
+        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
         self.gameData = {
             "Player" : {},
@@ -90,6 +96,7 @@ class Game:
 
             if self.game.bothPlayersReady():
                 self.battleBegin = True
+                self.window.blit(self.tableSprite,self.tableSpriteRect)
             
             if not self.battleBegin:
                 self.visibleSprites.custom_draw(self.player)

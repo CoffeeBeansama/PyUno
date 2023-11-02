@@ -11,6 +11,13 @@ class Game:
             "PlayerTwo" : None
         }
 
+        self.cardDeck = []
+        self.createCards()
+
+    
+    def createCards(self):
+        pass
+
         
 
             
