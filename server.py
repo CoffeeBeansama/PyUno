@@ -23,6 +23,8 @@ class Server:
 
         self.currentPlayers = 0
 
+        
+
     def startServer(self):
         try:
             self._socket.bind((self.server,self.port))
@@ -45,12 +47,15 @@ class Server:
                         break
                     else:
                         if data != "get":
-                           match player:
-                               case 0:    
-                                   game.updatePlayerOneData(data)
-                               case 1:
-                                   game.updatePlayerTwoData(data)
-                                 
+                           match data:
+                                case "Ready":
+                                    game.playerReady(player)
+                                case _:
+                                   if player == 0:
+                                       game.updatePlayerOneData(data)
+                                   if player == 1:
+                                       game.updatePlayerTwoData(data)
+                           
                         conn.sendall(pickle.dumps(game))
                 else:
                     break

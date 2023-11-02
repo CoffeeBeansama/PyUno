@@ -3,10 +3,12 @@ from support import loadSprite,import_folder
 
 
 class Player(pg.sprite.Sprite):
-    def __init__(self,id,pos,groups):
+    def __init__(self,id,pos,groups,collisionSprites,interactables):
         super().__init__(groups)
 
         self.id = id
+        self.collisionSprites = collisionSprites
+        self.interactableSprites = interactables
         self.spritePath = f"Sprites/Player{1}/" if self.id == 0 else f"Sprites/Player{2}/"
 
         self.importSprites()
@@ -34,9 +36,19 @@ class Player(pg.sprite.Sprite):
             fullPath = self.spritePath + animations
             self.animationStates[animations] = import_folder(fullPath)
 
+    def handleObjectInteraction(self):
+        for objects in self.interactableSprites:
+            if hasattr(objects,"interactHitbox"):
+                if objects.interactHitbox.colliderect(self.hitbox):
+                    objects.interact()
+                else:
+                    objects.ignore()
+
     def handleMovement(self):
         self.hitbox.x += self.direction.x * self.speed
+        self.handleWallCollision("Horizontal")
         self.hitbox.y += self.direction.y * self.speed
+        self.handleWallCollision("Vertical")
         self.rect.center = self.hitbox.center
 
     def handleAnimation(self):
@@ -67,6 +79,20 @@ class Player(pg.sprite.Sprite):
         self.direction.y = 0
         self.state = state
 
+    def handleWallCollision(self, direction):
+        for sprite in self.collisionSprites:
+            if sprite.hitbox.colliderect(self.hitbox):
+                if direction == "Horizontal":
+                    if self.direction.x < 0:
+                        self.hitbox.left = sprite.hitbox.right
+                    else:
+                        self.hitbox.right = sprite.hitbox.left
+                elif direction == "Vertical":
+                    if self.direction.y < 0:
+                        self.hitbox.top = sprite.hitbox.bottom
+                    else:
+                        self.hitbox.bottom = sprite.hitbox.top
+
     def handleInputs(self):
         keys = pg.key.get_pressed()
 
@@ -95,6 +121,7 @@ class Player(pg.sprite.Sprite):
         self.handleInputs()
         self.handleAnimation()
         self.handleMovement()
+        self.handleObjectInteraction()
         
         
         

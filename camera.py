@@ -9,14 +9,15 @@ class CameraGroup(pg.sprite.Group):
         self.half_height = self.display_canvas.get_size()[1] // 2
 
         
-
+        self.foregroundSprite = pg.image.load("Sprites/level.png")
+        self.foregroundRect = self.foregroundSprite.get_rect(topleft=(0,0))
         
 
-        self.internalSurfaceSize = (400, 500)
+        self.internalSurfaceSize = (300, 300)
         self.internalSurface = pg.Surface(self.internalSurfaceSize, pg.SRCALPHA)
         self.internalRect = self.internalSurface.get_rect(center=(self.half_width, self.half_height))
         self.offset_rect = None
-        self.zoomInSize = (800, 750)
+        self.zoomInSize = (700, 650)
 
         self.internalOffset = pg.math.Vector2()
         self.internalOffset.x = self.internalSurfaceSize[0] // 2 - self.half_width
@@ -33,7 +34,8 @@ class CameraGroup(pg.sprite.Group):
         self.offset.y = player.rect.centery - self.half_height
 
         self.internalSurface.fill("black")
-        
+        floorOffsetPos = self.foregroundRect.topleft - self.offset + self.internalOffset
+        self.internalSurface.blit(self.foregroundSprite,floorOffsetPos)
         for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
             self.offset_rect = sprite.rect.topleft - self.offset + self.internalOffset
             self.internalSurface.blit(sprite.image, self.offset_rect)
