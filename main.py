@@ -5,12 +5,9 @@ from player import Player
 from camera import CameraGroup
 from support import *
 from tile import Tile
-from enum import Enum
 from interactables import *
+from settings import *
 
-class MapTiles(Enum):
-    Walls = 1
-    InteractableObjects = 2
 
 class Game:
     def __init__(self):
@@ -58,9 +55,9 @@ class Game:
     def createMap(self):
         mapLayouts = {
             MapTiles.Walls: import_csv_layout("Map/wall.csv"),
-            MapTiles.InteractableObjects: import_csv_layout("Map/interactableObjects.csv")
-            
+            MapTiles.InteractableObjects: import_csv_layout("Map/interactableObjects.csv")    
         }
+
         for style,layout in mapLayouts.items():
             for rowIndex,row in enumerate(layout):
                 for columnIndex,column in enumerate(row):
@@ -95,8 +92,13 @@ class Game:
                 self.player.update()
 
             if self.game.bothPlayersReady():
-                self.battleBegin = True
                 self.window.blit(self.tableSprite,self.tableSpriteRect)
+                if not self.battleBegin:
+                    print(self.game.cardDeck)
+                    self.battleBegin = True
+
+                    
+                
             
             if not self.battleBegin:
                 self.visibleSprites.custom_draw(self.player)
@@ -111,12 +113,19 @@ class Game:
                     if type(self.game.getPlayerTwoData()) == str:
                         data = ast.literal_eval(str(self.game.getPlayerTwoData()))
                         playerData = data["Player"]
-                        self.player2.handlePlayer2Movement(playerData["Pos"],playerData["FrameIndex"],playerData["State"])
+                        self.player2.handlePlayer2Movement(
+                            playerData[PlayerData.Position.value],
+                            playerData[PlayerData.FrameIndex.value],
+                            playerData[PlayerData.State.value])
                 case 1:
                     if type(self.game.getPlayerOneData()) == str:
                         data = ast.literal_eval(str(self.game.getPlayerOneData()))
                         playerData = data["Player"]
-                        self.player2.handlePlayer2Movement(playerData["Pos"],playerData["FrameIndex"],playerData["State"])
+                        self.player2.handlePlayer2Movement(
+                            playerData[PlayerData.Position.value],
+                            playerData[PlayerData.FrameIndex.value],
+                            playerData[PlayerData.State.value])
+                        
                         
             pg.display.update()
             self.clock.tick(self.FPS)

@@ -1,4 +1,10 @@
 import pygame as pg
+import random
+
+class Card:
+    def __init__(self,value,color=None):
+        self.value = value
+        self.color = color
 
 class Game:
     def __init__(self,id):
@@ -12,15 +18,50 @@ class Game:
         }
 
         self.cardDeck = []
-        self.createCards()
 
-    
-    def createCards(self):
-        pass
+        self.powerCards = ["+2","Reverse","Skip"]
+        self.wildCards = ["Change Color", "+4"]
+        self.numberCards = [i for i in range(0,10)]
 
         
+        self.createCards()
 
-            
+
+    def createColorCards(self,color):
+        for i in range(2):
+            for j in range(len(self.numberCards)):
+                self.cardDeck.append(Card(self.numberCards[j],color))
+
+            for k in range(len(self.powerCards)):
+                self.cardDeck.append(Card(self.powerCards[k],color))
+
+    def createWildCards(self):
+        for i in range(4):
+            for j in range(len(self.wildCards)):
+                self.cardDeck.append(Card(self.wildCards[j]))
+
+    def createCards(self):
+        self.createColorCards("Blue")
+        self.createColorCards("Green")
+        self.createColorCards("Red")
+        self.createColorCards("Yellow")
+
+        self.createWildCards()
+
+        
+        random.shuffle(self.cardDeck)
+        
+
+        for i in self.cardDeck:
+            print(f"Color: {i.color}, Value: {i.value}")
+
+    
+    def shuffleCards(self):
+        for i in self.cardDeck:
+            print(f"Color: {i.color}, Value: {i.value}")
+
+       
+  
     def updatePlayerOneData(self,data):
         self.data["PlayerOne"] = data
         

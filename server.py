@@ -11,7 +11,7 @@ class Server:
         ip_address = socket.gethostbyname(hostname)
         self.server = ip_address
 
-        self.port = 5559
+        self.port = 5558
         self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
         self.gameIdCount = 0
@@ -40,21 +40,22 @@ class Server:
         reply = ""
         while True:
             try:
-                data = conn.recv(2068).decode()
+                data = conn.recv(4096*2).decode()
                 if gameId in self.games:
                     game = self.games[gameId]
                     if not data:
                         break
                     else:
                         if data != "get":
-                           match data:
-                                case "Ready":
-                                    game.playerReady(player)
-                                case _:
-                                   if player == 0:
-                                       game.updatePlayerOneData(data)
-                                   if player == 1:
-                                       game.updatePlayerTwoData(data)
+                           if data == "Ready":
+                                game.playerReady(player)
+                           if data == "Shuffle":
+                               game.shuffleCards()
+                           else:
+                                if player == 0:
+                                    game.updatePlayerOneData(data)
+                                if player == 1:
+                                    game.updatePlayerTwoData(data)
                            
                         conn.sendall(pickle.dumps(game))
                 else:

@@ -1,5 +1,6 @@
 import pygame as pg
 from support import loadSprite,import_folder
+from settings import PlayerData
 
 
 class Player(pg.sprite.Sprite):
@@ -115,9 +116,10 @@ class Player(pg.sprite.Sprite):
         self.image : pg.Surface = self.animationStates[self.state][int(self.frame_index)].convert_alpha()
 
     def update(self):
-        self.data["Pos"] = self.rect.center
-        self.data["State"] = self.state
-        self.data["FrameIndex"] = self.frame_index
+        self.data[PlayerData.Position.value] = self.rect.center
+        self.data[PlayerData.State.value] = self.state
+        self.data[PlayerData.FrameIndex.value] = self.frame_index
+
         self.handleInputs()
         self.handleAnimation()
         self.handleMovement()
