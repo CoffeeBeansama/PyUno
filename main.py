@@ -49,8 +49,22 @@ class Game:
 
         self.tileSize = 16
         self.createMap()
+        self.importCardSprites()
         pg.display.set_caption(f"Player {str(self.playerID+1)}")
         
+
+    def importCardSprites(self):
+        path = "Sprites/Uno Game Assets/"
+        self.cardSprites = {
+            "Blue": {}, "Red": {}, "Green": {} ,"Yellow": {},
+            "WildCards": {}
+   
+        }
+        for sprites in self.cardSprites.keys():
+            fullPath = path + sprites
+            self.cardSprites[sprites] = import_folder(fullPath)
+
+        print(self.cardSprites)
 
     def createMap(self):
         mapLayouts = {
@@ -94,7 +108,6 @@ class Game:
             if self.game.bothPlayersReady():
                 self.window.blit(self.tableSprite,self.tableSpriteRect)
                 if not self.battleBegin:
-                    print(self.game.cardDeck)
                     self.battleBegin = True
 
                     
@@ -107,26 +120,27 @@ class Game:
             
             self.network.send(str(self.gameData))
 
-            
-            match self.playerID:
-                case 0:
-                    if type(self.game.getPlayerTwoData()) == str:
-                        data = ast.literal_eval(str(self.game.getPlayerTwoData()))
-                        playerData = data["Player"]
-                        self.player2.handlePlayer2Movement(
-                            playerData[PlayerData.Position.value],
-                            playerData[PlayerData.FrameIndex.value],
-                            playerData[PlayerData.State.value])
-                case 1:
-                    if type(self.game.getPlayerOneData()) == str:
-                        data = ast.literal_eval(str(self.game.getPlayerOneData()))
-                        playerData = data["Player"]
-                        self.player2.handlePlayer2Movement(
-                            playerData[PlayerData.Position.value],
-                            playerData[PlayerData.FrameIndex.value],
-                            playerData[PlayerData.State.value])
+            try:
+                match self.playerID:
+                    case 0:
+                        if type(self.game.getPlayerTwoData()) == str:
+                            data = ast.literal_eval(str(self.game.getPlayerTwoData()))
+                            playerData = data["Player"]
+                            self.player2.handlePlayer2Movement(
+                                playerData[PlayerData.Position.value],
+                                playerData[PlayerData.FrameIndex.value],
+                                playerData[PlayerData.State.value])
+                    case 1:
+                        if type(self.game.getPlayerOneData()) == str:
+                            data = ast.literal_eval(str(self.game.getPlayerOneData()))
+                            playerData = data["Player"]
+                            self.player2.handlePlayer2Movement(
+                                playerData[PlayerData.Position.value],
+                                playerData[PlayerData.FrameIndex.value],
+                                playerData[PlayerData.State.value])
                         
-                        
+            except:
+                pass
             pg.display.update()
             self.clock.tick(self.FPS)
 

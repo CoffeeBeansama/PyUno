@@ -5,7 +5,7 @@ class PlayerData(Enum):
     State = 2
     FrameIndex = 3
 
-
 class MapTiles(Enum):
     Walls = 1
     InteractableObjects = 2
+

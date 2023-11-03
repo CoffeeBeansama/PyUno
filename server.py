@@ -40,7 +40,7 @@ class Server:
         reply = ""
         while True:
             try:
-                data = conn.recv(4096*2).decode()
+                data = conn.recv(4096).decode()
                 if gameId in self.games:
                     game = self.games[gameId]
                     if not data:

@@ -3,6 +3,7 @@ import random
 
 class Card:
     def __init__(self,value,color=None):
+        
         self.value = value
         self.color = color
 
@@ -40,6 +41,7 @@ class Game:
             for j in range(len(self.wildCards)):
                 self.cardDeck.append(Card(self.wildCards[j]))
 
+
     def createCards(self):
         self.createColorCards("Blue")
         self.createColorCards("Green")
@@ -48,17 +50,12 @@ class Game:
 
         self.createWildCards()
 
-        
         random.shuffle(self.cardDeck)
         
 
-        for i in self.cardDeck:
-            print(f"Color: {i.color}, Value: {i.value}")
-
     
     def shuffleCards(self):
-        for i in self.cardDeck:
-            print(f"Color: {i.color}, Value: {i.value}")
+        pass
 
        
   
