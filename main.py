@@ -54,17 +54,26 @@ class Game:
         
 
     def importCardSprites(self):
-        path = "Sprites/Uno Game Assets/"
-        self.cardSprites = {
-            "Blue": {}, "Red": {}, "Green": {} ,"Yellow": {},
-            "WildCards": {}
-   
-        }
-        for sprites in self.cardSprites.keys():
-            fullPath = path + sprites
-            self.cardSprites[sprites] = import_folder(fullPath)
 
-        print(self.cardSprites)
+        self.cardSpritePath = "Sprites/Uno Game Assets/"
+        self.cardSprites = {
+            "Blue" : {} ,"Red" : {}, "Yellow": {}, "Green": {},
+            "WildCards": {}
+        }
+
+        self.getColorCards("Blue")
+        self.getColorCards("Red")
+        self.getColorCards("Yellow")
+        self.getColorCards("Green")
+        self.getWildCards("WildCards")
+
+    def getColorCards(self,color):
+        for sprites in colorCards:
+            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120))
+
+    def getWildCards(self,color):
+        for sprites in wildCards:
+            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120))
 
     def createMap(self):
         mapLayouts = {
@@ -110,9 +119,7 @@ class Game:
                 if not self.battleBegin:
                     self.battleBegin = True
 
-                    
-                
-            
+        
             if not self.battleBegin:
                 self.visibleSprites.custom_draw(self.player)
 
@@ -141,6 +148,8 @@ class Game:
                         
             except:
                 pass
+
+            
             pg.display.update()
             self.clock.tick(self.FPS)
 
