@@ -49,8 +49,8 @@ class Server:
                         if data != "get":
                            if data == "Ready":
                                 game.playerReady(player)
-                           if data == "Shuffle":
-                               game.shuffleCards()
+                           if data == "Game Begin":
+                               game.roundBegin()
                            else:
                                 if player == 0:
                                     game.updatePlayerOneData(data)
@@ -63,7 +63,6 @@ class Server:
             except:
                 
                 break
-        
         print("Lost connection")
 
         try:

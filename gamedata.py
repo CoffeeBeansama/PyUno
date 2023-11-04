@@ -17,7 +17,11 @@ class Game:
             "PlayerOne" : None,
             "PlayerTwo" : None
         }
+        
 
+        self.pile = []
+        self.player1Deck = []
+        self.player2Deck = []
         self.cardDeck = []
 
         self.powerCards = ["+2","Reverse","Skip"]
@@ -54,10 +58,23 @@ class Game:
         
 
     
-    def shuffleCards(self):
-        pass
+    def roundBegin(self):
+        for cards in self.cardDeck[:7]:
+            self.player1Deck.append(cards)
+            self.cardDeck.remove(cards)
 
+        for cards in self.cardDeck[:7]:
+            self.player2Deck.append(cards)
+            self.cardDeck.remove(cards)
+        
+        self.pile.append(self.cardDeck[0])
+        self.cardDeck.pop(0)
+        
        
+        return
+
+        
+        
   
     def updatePlayerOneData(self,data):
         self.data["PlayerOne"] = data

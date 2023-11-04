@@ -14,7 +14,9 @@ class Game:
 
         width,height = 700,500
         self.window = pg.display.set_mode((width,height))
-    
+        pg.font.init()
+
+        self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
         self.running = True
         self.FPS = 60
         self.clock = pg.time.Clock()
@@ -96,10 +98,20 @@ class Game:
                             if column == "chair":
                                 Chair((x,y),self.interactableSprites,self.playerIn)
 
+
     def playerIn(self):
         self.playerReady = True
-        self.network.send("Ready")
-                
+        self.game = self.network.send("Ready")
+        if self.game.bothPlayersReady():
+            self.network.send("Game Begin")
+            self.battleBegin = True
+            return
+       
+    def displayFPS(self):
+         fps = self.font.render(f"FPS:{round(self.clock.get_fps())}",True,(255,255,255))
+         pos = (630,10)
+         self.window.blit(fps,pos)
+
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -115,12 +127,8 @@ class Game:
                 self.player.update()
 
             if self.game.bothPlayersReady():
-                self.window.blit(self.tableSprite,self.tableSpriteRect)
-                if not self.battleBegin:
-                    self.battleBegin = True
-
-        
-            if not self.battleBegin:
+                self.window.blit(self.tableSprite.convert_alpha(),self.tableSpriteRect)
+            else:
                 self.visibleSprites.custom_draw(self.player)
 
             self.gameData["Player"] = self.player.data
@@ -149,7 +157,7 @@ class Game:
             except:
                 pass
 
-            
+            self.displayFPS()
             pg.display.update()
             self.clock.tick(self.FPS)
 
