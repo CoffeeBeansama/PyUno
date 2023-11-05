@@ -40,9 +40,11 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-
+        self.cardsSize = (80,120)
+        self.startingCards = 7
         self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height))
         self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
+        self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize)
 
         self.gameData = {
             "Player" : {},
@@ -112,6 +114,10 @@ class Game:
          pos = (630,10)
          self.window.blit(fps,pos)
 
+    def displayCards(self):
+        self.window.blit(self.blankCard,(100,100))
+        pass
+
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -131,6 +137,7 @@ class Game:
             else:
                 self.visibleSprites.custom_draw(self.player)
 
+            
             self.gameData["Player"] = self.player.data
             
             self.network.send(str(self.gameData))

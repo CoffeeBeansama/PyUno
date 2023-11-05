@@ -62,15 +62,11 @@ class Game:
         for cards in self.cardDeck[:7]:
             self.player1Deck.append(cards)
             self.cardDeck.remove(cards)
-
         for cards in self.cardDeck[:7]:
             self.player2Deck.append(cards)
             self.cardDeck.remove(cards)
-        
         self.pile.append(self.cardDeck[0])
         self.cardDeck.pop(0)
-        
-       
         return
 
         
