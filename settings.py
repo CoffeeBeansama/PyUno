@@ -1,5 +1,7 @@
 from enum import Enum
 
+width,height = 700,500
+
 class PlayerData(Enum):
     Position = 1
     State = 2

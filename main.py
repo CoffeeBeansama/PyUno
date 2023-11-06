@@ -7,16 +7,15 @@ from support import *
 from tile import Tile
 from interactables import *
 from settings import *
+from ui import Ui
 
 
 class Game:
     def __init__(self):
 
-        width,height = 700,500
         self.window = pg.display.set_mode((width,height))
-        pg.font.init()
+        
 
-        self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
         self.running = True
         self.FPS = 60
         self.clock = pg.time.Clock()
@@ -40,12 +39,8 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-        self.cardsSize = (80,120)
-        self.startingCards = 7
-        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height))
-        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
-        self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize)
-
+        
+        self.ui = Ui(self.clock)
         self.gameData = {
             "Player" : {},
             
@@ -53,31 +48,9 @@ class Game:
 
         self.tileSize = 16
         self.createMap()
-        self.importCardSprites()
+        
         pg.display.set_caption(f"Player {str(self.playerID+1)}")
         
-
-    def importCardSprites(self):
-
-        self.cardSpritePath = "Sprites/Uno Game Assets/"
-        self.cardSprites = {
-            "Blue" : {} ,"Red" : {}, "Yellow": {}, "Green": {},
-            "WildCards": {}
-        }
-
-        self.getColorCards("Blue")
-        self.getColorCards("Red")
-        self.getColorCards("Yellow")
-        self.getColorCards("Green")
-        self.getWildCards("WildCards")
-
-    def getColorCards(self,color):
-        for sprites in colorCards:
-            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120))
-
-    def getWildCards(self,color):
-        for sprites in wildCards:
-            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120))
 
     def createMap(self):
         mapLayouts = {
@@ -109,14 +82,7 @@ class Game:
             self.battleBegin = True
             return
        
-    def displayFPS(self):
-         fps = self.font.render(f"FPS:{round(self.clock.get_fps())}",True,(255,255,255))
-         pos = (630,10)
-         self.window.blit(fps,pos)
-
-    def displayCards(self):
-        self.window.blit(self.blankCard,(100,100))
-        pass
+    
 
     def run(self):
         while self.running:
@@ -133,7 +99,7 @@ class Game:
                 self.player.update()
 
             if self.game.bothPlayersReady():
-                self.window.blit(self.tableSprite.convert_alpha(),self.tableSpriteRect)
+                self.ui.renderTableGame()
             else:
                 self.visibleSprites.custom_draw(self.player)
 
@@ -164,7 +130,7 @@ class Game:
             except:
                 pass
 
-            self.displayFPS()
+            self.ui.displayFPS()
             pg.display.update()
             self.clock.tick(self.FPS)
 
