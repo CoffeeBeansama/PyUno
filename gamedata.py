@@ -28,7 +28,8 @@ class Game:
         self.wildCards = ["Wild", "WildDraw"]
         self.numberCards = [i for i in range(0,10)]
 
-        
+        self.turn = 0
+
         self.createCards()
 
 
@@ -71,8 +72,6 @@ class Game:
                 self.pile.append(item)
                 self.cardDeck.pop(index)
                 return
-        
-        
         return
 
         

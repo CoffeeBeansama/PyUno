@@ -40,7 +40,7 @@ class Game:
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
         
-        self.ui = Ui(self.clock,self.playerID)
+        self.ui = Ui(self.clock,self.playerID,self.playerTurn)
         self.gameData = {
             "Player" : {},
         }
@@ -79,7 +79,9 @@ class Game:
             self.battleBegin = True
             return
        
-    
+    def playerTurn(self,color,value):
+        print(f"Color: {color}")
+        print(f"Value: {value}")
 
     def run(self):
         while self.running:
@@ -101,7 +103,8 @@ class Game:
 
 
             if self.game.bothPlayersReady():
-                self.ui.renderTableGame(self.game)
+                self.ui.handleRendering(self.game)
+                self.ui.handleUiEvent()
             else:
                 self.visibleSprites.custom_draw(self.player)
 

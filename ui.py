@@ -1,11 +1,13 @@
 import pygame as pg
 from support import loadSprite
 from settings import *
+from timer import Timer
 
 class Ui:
-    def __init__(self,clock,playerID):
+    def __init__(self,clock,playerID,playerTurn):
         self.clock = clock
         self.playerID = playerID
+        self.playerTurn = playerTurn
         self.screen = pg.display.get_surface()
         pg.font.init()
 
@@ -17,15 +19,14 @@ class Ui:
         self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
         self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize).convert_alpha()
 
-        
+        self.playerDeck = {}
+
         self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
         self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
         self.playerDeckBG.set_alpha(120)
         self.cardDeckWidth = 625
         self.p1DeckPosY = 355
         
-
-
         self.player2DeckBG = self.playerDeckBG
         self.player2DeckBG_Rect = self.player2DeckBG.get_rect(topleft=(20,10))
         self.player2DeckBG.set_alpha(120)
@@ -34,7 +35,14 @@ class Ui:
         self.wildCards = ["Wild","WildDraw"]
         self.colorCards = ["0","1","2","3","4","5","6","7","8","9","Draw","Reverse","Skip"]
         
+        self.transitionSprite = loadSprite("Sprites/playerDeckBg.png",(width,height)).convert_alpha()
+        self.transitionSpriteRect = self.transitionSprite.get_rect(topleft=(0,0))
+        self.transitionSprite.set_alpha(0)
+        self.transitioned = False
+
         self.importCardSprites()
+
+        self.timer = Timer(300)
     
     def importCardSprites(self):
 
@@ -67,8 +75,23 @@ class Ui:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
+    
+    def handleUiEvent(self):
+        self.timer.update()
+        mousePos = pg.mouse.get_pos()
+        mousePressed = pg.mouse.get_pressed()
 
-    def renderTableGame(self,game):
+        try:
+            for data,cardsUi in self.playerDeck.items():
+                   if cardsUi.collidepoint(mousePos) and not self.timer.activated:
+                        if mousePressed[0]:
+                            self.playerTurn(data[0],data[1])
+                            self.timer.activate()
+        except:
+            pass
+
+    def handleRendering(self,game):
+        
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
         self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
         self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
@@ -88,11 +111,11 @@ class Ui:
 
                 playerCardColours = game.player1Deck[i].color if self.playerID == 0 else game.player2Deck[i].color
                 playerCardValues = str(game.player1Deck[i].value) if self.playerID == 0 else str(game.player2Deck[i].value)
-
-                self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
+                
+                self.playerDeck[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
                                 (x,self.p1DeckPosY))
+                
             
-
             player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
             for j in range(player2DeckSize):
 
@@ -102,9 +125,11 @@ class Ui:
 
                 self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
-
-
+            
         except:
             pass
+
+        
+        
 
             
