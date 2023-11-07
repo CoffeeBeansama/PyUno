@@ -24,8 +24,8 @@ class Game:
         self.player2Deck = []
         self.cardDeck = []
 
-        self.powerCards = ["+2","Reverse","Skip"]
-        self.wildCards = ["Change Color", "+4"]
+        self.powerCards = ["Draw","Reverse","Skip"]
+        self.wildCards = ["Wild", "WildDraw"]
         self.numberCards = [i for i in range(0,10)]
 
         
@@ -43,7 +43,7 @@ class Game:
     def createWildCards(self):
         for i in range(4):
             for j in range(len(self.wildCards)):
-                self.cardDeck.append(Card(self.wildCards[j]))
+                self.cardDeck.append(Card(self.wildCards[j],"WildCards"))
 
 
     def createCards(self):
@@ -66,11 +66,15 @@ class Game:
             self.player2Deck.append(cards)
             self.cardDeck.remove(cards)
         
+        for i in self.player1Deck:
+            print(f"Color: {i.color}, Value: {i.value}")
+
         for index,item in enumerate(self.cardDeck):
             if item not in ["Wild","WildDraw"]:
                 self.pile.append(item)
                 self.cardDeck.pop(index)
                 return
+        
         
         return
 

@@ -49,6 +49,7 @@ class Ui:
         for sprites in self.colorCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120)).convert_alpha()
 
+        
     def getWildCards(self,color):
         for sprites in self.wildCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
@@ -70,5 +71,12 @@ class Ui:
         try:
             self.currentPileCard = game.pile[0]
             self.screen.blit(self.cardSprites[self.currentPileCard.color][str(self.currentPileCard.value)],(300,190))
+            for i in range(self.startingCards):
+                self.screen.blit(self.cardSprites[game.player1Deck[i].color if self.playerID == 0 else game.player2Deck[i].color]
+                            [str(game.player1Deck[i].value) if self.playerID == 0 else str(game.player2Deck[i].value)],
+                            (30 * (i + 1),355))
+            
         except:
             pass
+
+            
