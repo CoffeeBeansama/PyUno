@@ -21,14 +21,19 @@ class Ui:
         self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
         self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
         self.playerDeckBG.set_alpha(120)
+        self.cardDeckWidth = 625
+        self.p1DeckPosY = 355
+        
+
 
         self.player2DeckBG = self.playerDeckBG
         self.player2DeckBG_Rect = self.player2DeckBG.get_rect(topleft=(20,10))
         self.player2DeckBG.set_alpha(120)
+        self.p2DeckPosY = 20
 
         self.wildCards = ["Wild","WildDraw"]
         self.colorCards = ["0","1","2","3","4","5","6","7","8","9","Draw","Reverse","Skip"]
-
+        
         self.importCardSprites()
     
     def importCardSprites(self):
@@ -55,8 +60,8 @@ class Ui:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
     
     def displayFPS(self):
-         fps = self.font.render(f"FPS:{round(self.clock.get_fps())}",True,(255,255,255))
-         pos = (630,10)
+         fps = self.font.render(f"{round(self.clock.get_fps())}",True,(255,255,255))
+         pos = (670,10)
          self.screen.blit(fps,pos)
 
     def displayCards(self):
@@ -71,11 +76,34 @@ class Ui:
         try:
             self.currentPileCard = game.pile[0]
             self.screen.blit(self.cardSprites[self.currentPileCard.color][str(self.currentPileCard.value)],(300,190))
-            for i in range(self.startingCards):
-                self.screen.blit(self.cardSprites[game.player1Deck[i].color if self.playerID == 0 else game.player2Deck[i].color]
-                            [str(game.player1Deck[i].value) if self.playerID == 0 else str(game.player2Deck[i].value)],
-                            (30 * (i + 1),355))
+            self.screen.blit(self.blankCard,(410,190))
+
             
+            playerDeckSize : int = len(game.player1Deck if self.playerID == 0 else game.player2Deck)
+            for i in range(playerDeckSize):
+
+                lenghtDistance = self.playerDeckBG_Rect.y // playerDeckSize
+                lengthIncrement = self.cardDeckWidth // playerDeckSize
+                x = (i * lengthIncrement) + (lengthIncrement - lenghtDistance)
+
+                playerCardColours = game.player1Deck[i].color if self.playerID == 0 else game.player2Deck[i].color
+                playerCardValues = str(game.player1Deck[i].value) if self.playerID == 0 else str(game.player2Deck[i].value)
+
+                self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
+                                (x,self.p1DeckPosY))
+            
+
+            player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
+            for j in range(player2DeckSize):
+
+                lenghtDistance = self.playerDeckBG_Rect.y // player2DeckSize
+                lengthIncrement = self.cardDeckWidth // player2DeckSize
+                x = (j * lengthIncrement) + (lengthIncrement - lenghtDistance)
+
+                self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
+
+
+
         except:
             pass
 
