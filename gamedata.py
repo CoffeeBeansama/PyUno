@@ -65,8 +65,13 @@ class Game:
         for cards in self.cardDeck[:7]:
             self.player2Deck.append(cards)
             self.cardDeck.remove(cards)
-        self.pile.append(self.cardDeck[0])
-        self.cardDeck.pop(0)
+        
+        for index,item in enumerate(self.cardDeck):
+            if item not in ["Wild","WildDraw"]:
+                self.pile.append(item)
+                self.cardDeck.pop(index)
+                return
+        
         return
 
         

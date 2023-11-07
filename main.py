@@ -40,10 +40,9 @@ class Game:
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
         
-        self.ui = Ui(self.clock)
+        self.ui = Ui(self.clock,self.playerID)
         self.gameData = {
             "Player" : {},
-            
         }
 
         self.tileSize = 16
@@ -51,7 +50,6 @@ class Game:
         
         pg.display.set_caption(f"Player {str(self.playerID+1)}")
         
-
     def createMap(self):
         mapLayouts = {
             MapTiles.Walls: import_csv_layout("Map/wall.csv"),
@@ -61,7 +59,6 @@ class Game:
         for style,layout in mapLayouts.items():
             for rowIndex,row in enumerate(layout):
                 for columnIndex,column in enumerate(row):
-
                     if column != "-1":
                         x = columnIndex * self.tileSize
                         y = rowIndex * self.tileSize
@@ -98,15 +95,15 @@ class Game:
             if not self.playerReady:
                 self.player.update()
 
-            if self.game.bothPlayersReady():
-                self.ui.renderTableGame()
-            else:
-                self.visibleSprites.custom_draw(self.player)
-
-            
             self.gameData["Player"] = self.player.data
             
             self.network.send(str(self.gameData))
+
+
+            if self.game.bothPlayersReady():
+                self.ui.renderTableGame(self.game)
+            else:
+                self.visibleSprites.custom_draw(self.player)
 
             try:
                 match self.playerID:

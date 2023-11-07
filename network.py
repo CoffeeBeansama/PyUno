@@ -1,6 +1,6 @@
 import socket
 import pickle
-
+from settings import port
 
 class Network:
     def __init__(self):
@@ -9,7 +9,7 @@ class Network:
         ip_address = socket.gethostbyname(hostname)
         
         self.server = ip_address
-        self.port = 5558
+        self.port = port
         self.addr = (self.server,self.port)
         self.player = self.connect()
 

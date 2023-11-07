@@ -2,6 +2,7 @@ import socket
 from _thread import *
 import pickle
 from gamedata import Game
+from settings import port
 
 
 class Server:
@@ -11,7 +12,7 @@ class Server:
         ip_address = socket.gethostbyname(hostname)
         self.server = ip_address
 
-        self.port = 5558
+        self.port = port
         self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 
         self.gameIdCount = 0
