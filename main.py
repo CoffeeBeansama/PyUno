@@ -108,9 +108,8 @@ class Game:
                 
             else:
                 self.visibleSprites.custom_draw(self.player)
-                
-            self.gameData["Player"] = self.player.data
-            self.network.send(str(self.gameData))
+                self.gameData["Player"] = self.player.data
+                self.network.send(str(self.gameData))
             
             try:
                 match self.playerID:
