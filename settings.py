@@ -3,6 +3,10 @@ from enum import Enum
 width,height = 700,500
 port = 5558
 
+class CardData(Enum):
+    Value = 0
+    Color = 1    
+
 class PlayerData(Enum):
     Position = 1
     State = 2

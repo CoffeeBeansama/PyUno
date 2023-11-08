@@ -43,7 +43,7 @@ class Game:
         self.ui = Ui(self.clock,self.playerID,self.playerTurn)
         self.gameData = {
             "Player" : {},
-            "PlayerTurn" : {}
+            "PlayerTurn" : None
         }
 
         self.tileSize = 16
@@ -81,7 +81,8 @@ class Game:
             return
        
     def playerTurn(self,color,value):
-        self.gameData["PlayerTurn"] = (color,value)
+        self.gameData["PlayerTurn"] = (value,color)
+        
         self.game = self.network.send(str(self.gameData))
         return
         
@@ -107,28 +108,24 @@ class Game:
                 
             else:
                 self.visibleSprites.custom_draw(self.player)
-                self.gameData["Player"] = self.player.data
-                self.network.send(str(self.gameData))
-
+                
+            self.gameData["Player"] = self.player.data
+            self.network.send(str(self.gameData))
+            
             try:
                 match self.playerID:
                     case 0:
-                        if type(self.game.getPlayerTwoData()) == str:
-                            data = ast.literal_eval(str(self.game.getPlayerTwoData()))
-                            playerData = data["Player"]
+                            data = self.game.getPlayerTwoData()
                             self.player2.handlePlayer2Movement(
-                                playerData[PlayerData.Position.value],
-                                playerData[PlayerData.FrameIndex.value],
-                                playerData[PlayerData.State.value])
+                                    data[PlayerData.Position.value],
+                                    data[PlayerData.FrameIndex.value],
+                                    data[PlayerData.State.value])
                     case 1:
-                        if type(self.game.getPlayerOneData()) == str:
-                            data = ast.literal_eval(str(self.game.getPlayerOneData()))
-                            playerData = data["Player"]
+                            data = self.game.getPlayerOneData()
                             self.player2.handlePlayer2Movement(
-                                playerData[PlayerData.Position.value],
-                                playerData[PlayerData.FrameIndex.value],
-                                playerData[PlayerData.State.value])
-                        
+                                    data[PlayerData.Position.value],
+                                    data[PlayerData.FrameIndex.value],
+                                    data[PlayerData.State.value])
             except:
                 pass
 

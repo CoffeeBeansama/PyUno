@@ -98,7 +98,7 @@ class Ui:
 
         try:
             self.currentPileCard = game.pile[0]
-            self.screen.blit(self.cardSprites[self.currentPileCard.color][str(self.currentPileCard.value)],(300,190))
+            self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[0])],(300,190))
             self.screen.blit(self.blankCard,(410,190))
 
             
@@ -109,8 +109,8 @@ class Ui:
                 lengthIncrement = self.cardDeckWidth // playerDeckSize
                 x = (i * lengthIncrement) + (lengthIncrement - lenghtDistance)
 
-                playerCardColours = game.player1Deck[i].color if self.playerID == 0 else game.player2Deck[i].color
-                playerCardValues = str(game.player1Deck[i].value) if self.playerID == 0 else str(game.player2Deck[i].value)
+                playerCardColours = game.player1Deck[i][CardData.Color.value] if self.playerID == 0 else game.player2Deck[i][CardData.Color.value]
+                playerCardValues = str(game.player1Deck[i][CardData.Value.value]) if self.playerID == 0 else str(game.player2Deck[i][CardData.Value.value])
                 
                 self.playerDeck[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
                                 (x,self.p1DeckPosY))

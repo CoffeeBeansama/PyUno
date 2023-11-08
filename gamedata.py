@@ -1,6 +1,7 @@
 import pygame as pg
 import random
 import ast
+from settings import CardData
 
 class Card:
     def __init__(self,value,color=None):
@@ -37,15 +38,15 @@ class Game:
     def createColorCards(self,color):
         for i in range(2):
             for j in range(len(self.numberCards)):
-                self.cardDeck.append(Card(self.numberCards[j],color))
+                self.cardDeck.append((str(self.numberCards[j]),color))
 
             for k in range(len(self.powerCards)):
-                self.cardDeck.append(Card(self.powerCards[k],color))
+                self.cardDeck.append((str(self.powerCards[k]),color))
 
     def createWildCards(self):
         for i in range(4):
             for j in range(len(self.wildCards)):
-                self.cardDeck.append(Card(self.wildCards[j],"WildCards"))
+                self.cardDeck.append((self.wildCards[j],"WildCards"))
 
 
     def createCards(self):
@@ -58,7 +59,7 @@ class Game:
 
         random.shuffle(self.cardDeck)
         
-
+    
     
     def roundBegin(self):
         for cards in self.cardDeck[:7]:
@@ -69,29 +70,34 @@ class Game:
             self.cardDeck.remove(cards)
         
         for index,item in enumerate(self.cardDeck):
-            if item.value not in ["Wild","WildDraw"]:
+            if item[CardData.Value.value] not in ["Wild","WildDraw"]:
                 self.pile.append(item)
                 self.cardDeck.pop(index)
                 return
         return
 
-        
-        
   
     def updatePlayerOneData(self,data):
         try:
             player1Data = ast.literal_eval(str(data))
-            self.data["PlayerOneData"] = player1Data["Player"]
-            self.data["PlayerOneTurn"] = player1Data["PlayerTurn"]
+            self.data["PlayerOne"] = player1Data["Player"]
             
+            
+            if player1Data["PlayerTurn"] is not None:
+                if player1Data["PlayerTurn"] in self.player1Deck:
+                    self.player1Deck.remove(player1Data["PlayerTurn"])
+                
         except:
             pass
         
     def updatePlayerTwoData(self,data):
         try:
             player2Data = ast.literal_eval(str(data))
-            self.data["PlayerTwoData"] = player2Data["Player"]
-            self.data["PlayerTwoTurn"] = player2Data["PlayerTurn"]
+            self.data["PlayerTwo"] = player2Data["Player"]
+            
+            if player2Data["PlayerTurn"] is not None:
+                if player2Data["PlayerTurn"] in self.player2Deck:
+                    self.player2Deck.remove(player2Data["PlayerTurn"])
             
         except:
             pass
