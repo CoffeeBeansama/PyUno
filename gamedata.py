@@ -76,15 +76,23 @@ class Game:
                 return
         return
 
-  
+    def incrementTurn(self):
+        self.turn += 1
+        if self.turn >= 2:
+            self.turn = 0
+        
+
+    def getCurrentTurn(self):
+        return self.turn
+
     def updatePlayerOneData(self,data):
         try:
             player1Data = ast.literal_eval(str(data))
             self.data["PlayerOne"] = player1Data["Player"]
             
-            
             if player1Data["PlayerTurn"] is not None:
                 if player1Data["PlayerTurn"] in self.player1Deck:
+                    print(player1Data["PlayerTurn"])
                     self.player1Deck.remove(player1Data["PlayerTurn"])
                 
         except:
@@ -97,6 +105,7 @@ class Game:
             
             if player2Data["PlayerTurn"] is not None:
                 if player2Data["PlayerTurn"] in self.player2Deck:
+                    print(player2Data["PlayerTurn"])
                     self.player2Deck.remove(player2Data["PlayerTurn"])
             
         except:

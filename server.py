@@ -48,9 +48,11 @@ class Server:
                         break
                     else:
                         if data != "get":
-                           if data == "Ready":
+                           if data == "PlayerTurn":
+                               game.incrementTurn()
+                           elif data == "Ready":
                                 game.playerReady(player)
-                           if data == "Game Begin":
+                           elif data == "Game Begin":
                                game.roundBegin()
                            else:
                                 if player == 0:

@@ -81,10 +81,13 @@ class Game:
             return
        
     def playerTurn(self,color,value):
-        self.gameData["PlayerTurn"] = (value,color)
+        print(self.game.getCurrentTurn())
+        if self.game.getCurrentTurn() == self.playerID:
+            self.gameData["PlayerTurn"] = (value,color)
+            self.game = self.network.send(str(self.gameData))
+            self.network.send("PlayerTurn")
+
         
-        self.game = self.network.send(str(self.gameData))
-        return
         
 
     def run(self):
