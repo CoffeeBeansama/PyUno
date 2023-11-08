@@ -43,6 +43,7 @@ class Game:
         self.ui = Ui(self.clock,self.playerID,self.playerTurn)
         self.gameData = {
             "Player" : {},
+            "PlayerTurn" : {}
         }
 
         self.tileSize = 16
@@ -80,8 +81,10 @@ class Game:
             return
        
     def playerTurn(self,color,value):
-        print(f"Color: {color}")
-        print(f"Value: {value}")
+        self.gameData["PlayerTurn"] = (color,value)
+        self.game = self.network.send(str(self.gameData))
+        return
+        
 
     def run(self):
         while self.running:
@@ -97,16 +100,15 @@ class Game:
             if not self.playerReady:
                 self.player.update()
 
-            self.gameData["Player"] = self.player.data
             
-            self.network.send(str(self.gameData))
-
-
             if self.game.bothPlayersReady():
                 self.ui.handleRendering(self.game)
                 self.ui.handleUiEvent()
+                
             else:
                 self.visibleSprites.custom_draw(self.player)
+                self.gameData["Player"] = self.player.data
+                self.network.send(str(self.gameData))
 
             try:
                 match self.playerID:

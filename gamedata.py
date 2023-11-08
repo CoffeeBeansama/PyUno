@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import ast
 
 class Card:
     def __init__(self,value,color=None):
@@ -78,10 +79,22 @@ class Game:
         
   
     def updatePlayerOneData(self,data):
-        self.data["PlayerOne"] = data
+        try:
+            player1Data = ast.literal_eval(str(data))
+            self.data["PlayerOneData"] = player1Data["Player"]
+            self.data["PlayerOneTurn"] = player1Data["PlayerTurn"]
+            
+        except:
+            pass
         
     def updatePlayerTwoData(self,data):
-        self.data["PlayerTwo"] = data
+        try:
+            player2Data = ast.literal_eval(str(data))
+            self.data["PlayerTwoData"] = player2Data["Player"]
+            self.data["PlayerTwoTurn"] = player2Data["PlayerTurn"]
+            
+        except:
+            pass
 
     def getPlayerOneData(self):
         return self.data["PlayerOne"]
