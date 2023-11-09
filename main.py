@@ -85,7 +85,7 @@ class Game:
         if self.game.getCurrentTurn() == self.playerID:
             self.gameData["PlayerTurn"] = (value,color)
             self.game = self.network.send(str(self.gameData))
-            self.network.send("PlayerTurn")
+            
 
         
         

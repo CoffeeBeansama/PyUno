@@ -92,9 +92,9 @@ class Game:
             
             if player1Data["PlayerTurn"] is not None:
                 if player1Data["PlayerTurn"] in self.player1Deck:
-                    print(player1Data["PlayerTurn"])
+                    
                     self.player1Deck.remove(player1Data["PlayerTurn"])
-                
+                    self.incrementTurn()
         except:
             pass
         
@@ -105,8 +105,9 @@ class Game:
             
             if player2Data["PlayerTurn"] is not None:
                 if player2Data["PlayerTurn"] in self.player2Deck:
-                    print(player2Data["PlayerTurn"])
+                    
                     self.player2Deck.remove(player2Data["PlayerTurn"])
+                    self.incrementTurn()
             
         except:
             pass

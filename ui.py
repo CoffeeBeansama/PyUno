@@ -72,23 +72,21 @@ class Ui:
          pos = (670,10)
          self.screen.blit(fps,pos)
 
+
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
-    
     def handleUiEvent(self):
         self.timer.update()
         mousePos = pg.mouse.get_pos()
         mousePressed = pg.mouse.get_pressed()
 
-        try:
-            for data,cardsUi in self.playerDeck.items():
-                   if cardsUi.collidepoint(mousePos) and not self.timer.activated:
-                        if mousePressed[0]:
-                            self.playerTurn(data[0],data[1])
-                            self.timer.activate()
-        except:
-            pass
+        for data,cardsUi in self.playerDeck.items():
+                if cardsUi.collidepoint(mousePos):
+                    if mousePressed[0]:
+                        self.playerTurn(data[0],data[1])
+                        
+        
 
     def handleRendering(self,game):
         
