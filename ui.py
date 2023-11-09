@@ -76,6 +76,7 @@ class Ui:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
+
     def handleUiEvent(self):
         self.timer.update()
         mousePos = pg.mouse.get_pos()
@@ -95,8 +96,8 @@ class Ui:
         self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
 
         try:
-            self.currentPileCard = game.pile[0]
-            self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[0])],(300,190))
+            self.currentPileCard = game.getCurrentPileCard()
+            self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
             self.screen.blit(self.blankCard,(410,190))
 
             

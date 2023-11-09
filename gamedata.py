@@ -3,12 +3,6 @@ import random
 import ast
 from settings import CardData
 
-class Card:
-    def __init__(self,value,color=None):
-        
-        self.value = value
-        self.color = color
-
 class Game:
     def __init__(self,id):
         self.id = id
@@ -47,7 +41,7 @@ class Game:
         for i in range(4):
             for j in range(len(self.wildCards)):
                 self.cardDeck.append((self.wildCards[j],"WildCards"))
-
+        
 
     def createCards(self):
         self.createColorCards("Blue")
@@ -92,7 +86,7 @@ class Game:
             
             if player1Data["PlayerTurn"] is not None:
                 if player1Data["PlayerTurn"] in self.player1Deck:
-                    
+                    self.pile.append(player1Data["PlayerTurn"])
                     self.player1Deck.remove(player1Data["PlayerTurn"])
                     self.incrementTurn()
         except:
@@ -102,10 +96,10 @@ class Game:
         try:
             player2Data = ast.literal_eval(str(data))
             self.data["PlayerTwo"] = player2Data["Player"]
-            
+        
             if player2Data["PlayerTurn"] is not None:
                 if player2Data["PlayerTurn"] in self.player2Deck:
-                    
+                    self.pile.append(player2Data["PlayerTurn"])
                     self.player2Deck.remove(player2Data["PlayerTurn"])
                     self.incrementTurn()
             
@@ -125,7 +119,8 @@ class Game:
             case 1:
                 self.playersReady[1] = True
 
-    
+    def getCurrentPileCard(self):
+        return self.pile[-1]
 
     def bothPlayersReady(self):
         if self.playersReady[0] and self.playersReady[1]:
