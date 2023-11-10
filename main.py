@@ -39,8 +39,8 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-        
-        self.ui = Ui(self.clock,self.playerID,self.playerTurn)
+        self.ui = Ui(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
+
         self.gameData = {
             "Player" : {},
             "PlayerTurn" : None
@@ -79,11 +79,13 @@ class Game:
             self.network.send("Game Begin")
             self.battleBegin = True
             return
-       
-    def playerTurn(self,color,value):
-        
-        if self.game.getCurrentTurn() == self.playerID:
     
+    def drawSingleCard(self):
+        if self.game.getCurrentTurn() == self.playerID:
+            self.game = self.network.send("Draw Single Card")
+
+    def playerTurn(self,color,value):
+        if self.game.getCurrentTurn() == self.playerID:
             if value in ["Wild", "WildDraw"]:
                 self.gameData["PlayerTurn"] = (value,color)
                 self.game = self.network.send(str(self.gameData))

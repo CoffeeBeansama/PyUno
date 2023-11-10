@@ -4,11 +4,14 @@ from settings import *
 from timer import Timer
 
 class Ui:
-    def __init__(self,clock,playerID,playerTurn):
+    def __init__(self,clock,playerID,playerTurn,drawSingleCard):
+        self.screen = pg.display.get_surface()
+
         self.clock = clock
         self.playerID = playerID
         self.playerTurn = playerTurn
-        self.screen = pg.display.get_surface()
+        self.drawSingleCard = drawSingleCard
+
         pg.font.init()
 
         self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
@@ -43,6 +46,8 @@ class Ui:
         self.importCardSprites()
 
         self.timer = Timer(300)
+
+        self.drawCard = self.screen.blit(self.blankCard,(410,190))
     
     def importCardSprites(self):
 
@@ -87,10 +92,14 @@ class Ui:
                     if mousePressed[0]:
                         self.playerTurn(data[0],data[1])
                         
-        
+        if self.drawCard.collidepoint(mousePos):
+            if not self.timer.activated:
+                if mousePressed[0]:
+                    self.drawSingleCard()
+                    self.timer.activate()
 
     def handleRendering(self,game):
-        
+        self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
         self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
         self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
@@ -98,7 +107,7 @@ class Ui:
         try:
             self.currentPileCard = game.getCurrentPileCard()
             self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
-            self.screen.blit(self.blankCard,(410,190))
+            self.drawCard = self.screen.blit(self.blankCard,(410,190))
 
             
             playerDeckSize : int = len(game.player1Deck if self.playerID == 0 else game.player2Deck)

@@ -25,6 +25,7 @@ class Game:
         self.numberCards = [i for i in range(0,10)]
 
         self.turn = 0
+        self.cardDrawStreak = 0
 
         self.createCards()
 
@@ -41,8 +42,7 @@ class Game:
         for i in range(4):
             for j in range(len(self.wildCards)):
                 self.cardDeck.append((self.wildCards[j],"WildCards"))
-        
-
+    
     def createCards(self):
         self.createColorCards("Blue")
         self.createColorCards("Green")
@@ -53,7 +53,6 @@ class Game:
 
         random.shuffle(self.cardDeck)
         
-    
     
     def roundBegin(self):
         for cards in self.cardDeck[:7]:
@@ -75,34 +74,37 @@ class Game:
         if self.turn >= 2:
             self.turn = 0
         
+    def drawSingleCard(self,player):
+        if player == 0:
+            self.player1Deck.append(self.cardDeck[0])
+            self.cardDeck.pop(0)
+        elif player == 1:
+            self.player2Deck.append(self.cardDeck[0])
+            self.cardDeck.pop(0)
+        self.incrementTurn()
 
     def getCurrentTurn(self):
         return self.turn
 
-    def updatePlayerOneData(self,data):
+   
+    def updatePlayerData(self,player,data):
         try:
-            player1Data = ast.literal_eval(str(data))
-            self.data["PlayerOne"] = player1Data["Player"]
-            
-            if player1Data["PlayerTurn"] is not None:
-                if player1Data["PlayerTurn"] in self.player1Deck:
-                    self.pile.append(player1Data["PlayerTurn"])
-                    self.player1Deck.remove(player1Data["PlayerTurn"])
-                    self.incrementTurn()
-        except:
-            pass
-        
-    def updatePlayerTwoData(self,data):
-        try:
-            player2Data = ast.literal_eval(str(data))
-            self.data["PlayerTwo"] = player2Data["Player"]
-        
-            if player2Data["PlayerTurn"] is not None:
-                if player2Data["PlayerTurn"] in self.player2Deck:
-                    self.pile.append(player2Data["PlayerTurn"])
-                    self.player2Deck.remove(player2Data["PlayerTurn"])
-                    self.incrementTurn()
-            
+            if player == 0:
+                player1Data = ast.literal_eval(str(data))
+                self.data["PlayerOne"] = player1Data["Player"]
+                if player1Data["PlayerTurn"] is not None:
+                    if player1Data["PlayerTurn"] in self.player1Deck:
+                        self.pile.append(player1Data["PlayerTurn"])
+                        self.player1Deck.remove(player1Data["PlayerTurn"])
+                        self.incrementTurn()
+            elif player == 1:
+                player2Data = ast.literal_eval(str(data))
+                self.data["PlayerTwo"] = player2Data["Player"]
+                if player2Data["PlayerTurn"] is not None:
+                    if player2Data["PlayerTurn"] in self.player2Deck:
+                        self.pile.append(player2Data["PlayerTurn"])
+                        self.player2Deck.remove(player2Data["PlayerTurn"])
+                        self.incrementTurn()
         except:
             pass
 

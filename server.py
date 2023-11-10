@@ -50,15 +50,15 @@ class Server:
                         if data != "get":
                            if data == "PlayerTurn":
                                game.incrementTurn()
+                           elif data == "Draw Single Card":
+                               game.drawSingleCard(player)
                            elif data == "Ready":
                                 game.playerReady(player)
                            elif data == "Game Begin":
                                game.roundBegin()
                            else:
-                                if player == 0:
-                                    game.updatePlayerOneData(data)
-                                if player == 1:
-                                    game.updatePlayerTwoData(data)
+                                game.updatePlayerData(player,data)
+                                
                            
                         conn.sendall(pickle.dumps(game))
                 else:
