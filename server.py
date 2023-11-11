@@ -52,6 +52,8 @@ class Server:
                                game.incrementTurn()
                            elif data == "Draw Single Card":
                                game.drawSingleCard(player)
+                           elif data == "Draw Multiple Cards":
+                               game.drawMultipleCards(player)
                            elif data == "Plus Two":
                                game.addPlusTwoCardStreak()
                            elif data == "Ready":

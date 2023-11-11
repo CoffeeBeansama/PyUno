@@ -120,6 +120,18 @@ class Game:
     def getPlayerTwoData(self):
         return self.data["PlayerTwo"]
     
+    def drawMultipleCards(self,player):
+        for i in range(0,self.cardDrawStreak):
+            if player == 0:
+                self.player1Deck.append(self.cardDeck[i])
+                self.cardDeck.pop(i)
+            elif player == 1:
+                self.player2Deck.append(self.cardDeck[i])
+                self.cardDeck.pop(i)
+                
+        self.cardDrawStreak = 0
+        self.incrementTurn()
+
     def playerReady(self,player):
         match player:
             case 0:
