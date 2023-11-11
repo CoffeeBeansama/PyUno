@@ -86,7 +86,13 @@ class Game:
     def getCurrentTurn(self):
         return self.turn
 
-   
+    def getCurrentDrawStreak(self):
+        return self.cardDrawStreak
+    
+    def addPlusTwoCardStreak(self):
+        self.cardDrawStreak += 2
+        print(self.cardDrawStreak)
+
     def updatePlayerData(self,player,data):
         try:
             if player == 0:

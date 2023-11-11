@@ -82,17 +82,27 @@ class Game:
     
     def drawSingleCard(self):
         if self.game.getCurrentTurn() == self.playerID:
-            self.game = self.network.send("Draw Single Card")
+            if self.game.getCurrentDrawStreak() <= 0:
+                self.game = self.network.send("Draw Single Card")
 
     def playerTurn(self,color,value):
+        
         if self.game.getCurrentTurn() == self.playerID:
             if value in ["Wild", "WildDraw"]:
                 self.gameData["PlayerTurn"] = (value,color)
                 self.game = self.network.send(str(self.gameData))
-            elif self.game.getCurrentPileCard()[CardData.Color.value] == color:
-                self.gameData["PlayerTurn"] = (value,color)
-                self.game = self.network.send(str(self.gameData))
+
+            
             elif self.game.getCurrentPileCard()[CardData.Value.value] == value:
+                if value == "Draw":
+                    print(value)
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send("Plus Two")
+                    self.game = self.network.send(str(self.gameData))
+                else:
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send(str(self.gameData))
+            elif self.game.getCurrentPileCard()[CardData.Color.value] == color:
                 self.gameData["PlayerTurn"] = (value,color)
                 self.game = self.network.send(str(self.gameData))
             
