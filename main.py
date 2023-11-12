@@ -7,8 +7,8 @@ from support import *
 from tile import Tile
 from interactables import *
 from settings import *
-from ui import Ui
-
+from cardUi import CardUi
+from colorUi import ColorUi
 
 class Game:
     def __init__(self):
@@ -39,7 +39,8 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-        self.ui = Ui(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
+        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
+        self.colorUi = ColorUi(self.setColor)
 
         self.gameData = {
             "Player" : {},
@@ -72,6 +73,10 @@ class Game:
                                 Chair((x,y),self.interactableSprites,self.playerIn)
 
 
+    def setColor(self,color):
+        self.game = self.network.send(color)
+     
+
     def playerIn(self):
         self.playerReady = True
         self.game = self.network.send("Ready")
@@ -88,42 +93,50 @@ class Game:
                 self.game = self.network.send("Draw Multiple Cards")
 
     def playerTurn(self,color,value):
+        
         if self.game.getCurrentTurn() == self.playerID:
-            if value in ["Wild", "WildDraw"]:
-                if value == "WildDraw":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send("Plus Four")
-                    self.game = self.network.send(str(self.gameData))
-                elif value == "Wild":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.gameData))
-                
-                self.ui.renderColours = True
 
-            elif self.game.getCurrentDrawStreak() > 0 and value == "Draw":
+            print((value,color))
+            if self.game.getCurrentPileCard()[CardData.Value.value] == value and self.game.getCurrentDrawStreak() <= 0:
+                self.sendUiEvent(value,color)
+                    
+            elif self.game.getCurrentPileCard()[CardData.Color.value] == color and self.game.getCurrentDrawStreak() <= 0:
+                self.sendUiEvent(value,color)
+
+            elif color == self.game.getCurrrentColor() and self.game.getCurrentDrawStreak() <= 0:
+                self.sendUiEvent(value,color)
+
+            elif value == "WildDraw":
+                self.gameData["PlayerTurn"] = (value,color)
+                self.game = self.network.send("Plus Four")
+                self.game = self.network.send(str(self.gameData))
+                self.colorUi.renderColours = True
+
+            elif value == "Wild" and self.game.getCurrentDrawStreak() <= 0:
+                self.gameData["PlayerTurn"] = (value,color)
+                self.game = self.network.send(str(self.gameData))
+                self.colorUi.renderColours = True
+                
+            elif value == "Draw" and self.game.getCurrentDrawStreak() > 0:
                 self.gameData["PlayerTurn"] = (value,color)
                 self.game = self.network.send("Plus Two")
                 self.game = self.network.send(str(self.gameData))
 
-            elif self.game.getCurrentPileCard()[CardData.Value.value] == value:
-                if value == "Draw":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send("Plus Two")
-                    self.game = self.network.send(str(self.gameData))
-                else:
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.gameData))
-                    
-            elif self.game.getCurrentPileCard()[CardData.Color.value] == color:
-                if value == "Draw":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send("Plus Two")
-                    self.game = self.network.send(str(self.gameData))
-                else:
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.gameData))
-
             
+            
+
+           
+    
+
+    def sendUiEvent(self,value,color):
+        if value == "Draw":
+            self.gameData["PlayerTurn"] = (value,color)
+            self.game = self.network.send("Plus Two")
+            self.game = self.network.send(str(self.gameData))
+        else:
+            self.gameData["PlayerTurn"] = (value,color)
+            self.game = self.network.send(str(self.gameData))
+
                 
 
     def run(self):
@@ -142,18 +155,20 @@ class Game:
 
             
             if self.game.bothPlayersReady():
-                self.ui.handleRendering(self.game)
-                self.ui.handleUiEvent()
+
+                self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
+                self.cardUi.handleUiEvent()
+
+                self.colorUi.drawColours()
+                self.colorUi.handleUiEvent()
+
             else:
                 self.visibleSprites.custom_draw(self.player)
                 self.gameData["Player"] = self.player.data
                 self.network.send(str(self.gameData))
             
            
-            if self.game.getCurrentTurn() == self.playerID:
-                if self.gameData["PlayerTurn"] is not None:
-                    if self.gameData["PlayerTurn"][CardData.Value.value] in ["Wild","WildDraw"]:
-                        print("this")
+            
 
                 
             try:
@@ -173,7 +188,7 @@ class Game:
             except:
                 pass
 
-            self.ui.displayFPS()
+            self.cardUi.displayFPS()
             pg.display.update()
             self.clock.tick(self.FPS)
 

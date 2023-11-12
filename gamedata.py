@@ -27,7 +27,11 @@ class Game:
         self.turn = 0
         self.cardDrawStreak = 0
 
+        
+
         self.createCards()
+
+        self.currentColor = None
 
 
     def createColorCards(self,color):
@@ -67,7 +71,12 @@ class Game:
                 self.pile.append(item)
                 self.cardDeck.pop(index)
                 return
+        
+        self.currentColor = self.pile[0][CardData.Color.value]
+       
         return
+    
+    
 
     def incrementTurn(self):
         self.turn += 1
@@ -140,6 +149,13 @@ class Game:
                 self.playersReady[0] = True
             case 1:
                 self.playersReady[1] = True
+
+    def setCurrentColor(self,color):
+        self.currentColor = color
+        
+
+    def getCurrrentColor(self):
+        return self.currentColor
 
     def getCurrentPileCard(self):
         return self.pile[-1]
