@@ -89,13 +89,17 @@ class Game:
 
     def playerTurn(self,color,value):
         if self.game.getCurrentTurn() == self.playerID:
-
             if value in ["Wild", "WildDraw"]:
                 if value == "WildDraw":
                     self.gameData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Four")
                     self.game = self.network.send(str(self.gameData))
-                    
+                elif value == "Wild":
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send(str(self.gameData))
+                
+                self.ui.renderColours = True
+
             elif self.game.getCurrentDrawStreak() > 0 and value == "Draw":
                 self.gameData["PlayerTurn"] = (value,color)
                 self.game = self.network.send("Plus Two")
@@ -140,12 +144,18 @@ class Game:
             if self.game.bothPlayersReady():
                 self.ui.handleRendering(self.game)
                 self.ui.handleUiEvent()
-                
             else:
                 self.visibleSprites.custom_draw(self.player)
                 self.gameData["Player"] = self.player.data
                 self.network.send(str(self.gameData))
             
+           
+            if self.game.getCurrentTurn() == self.playerID:
+                if self.gameData["PlayerTurn"] is not None:
+                    if self.gameData["PlayerTurn"][CardData.Value.value] in ["Wild","WildDraw"]:
+                        print("this")
+
+                
             try:
                 match self.playerID:
                     case 0:

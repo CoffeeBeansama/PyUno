@@ -47,8 +47,21 @@ class Ui:
 
         self.timer = Timer(300)
 
+        
+        self.renderColours = False
+
         self.drawCard = self.screen.blit(self.blankCard,(410,190))
+
+
+        self.blue = None
+        self.green = None
+        self.red = None
+        self.yellow = None
+
+
+        self.colorSize = 150
     
+
     def importCardSprites(self):
 
         self.cardSpritePath = "Sprites/Uno Game Assets/"
@@ -98,18 +111,53 @@ class Ui:
                     self.drawSingleCard()
                     self.timer.activate()
 
+        self.handleColourClickEvent(self.blue,mousePos,mousePressed)
+        self.handleColourClickEvent(self.green,mousePos,mousePressed)
+        self.handleColourClickEvent(self.yellow,mousePos,mousePressed)
+        self.handleColourClickEvent(self.red,mousePos,mousePressed)
+
+    
+    def handleColourClickEvent(self,color,mousePos,mousePressed,event=None):
+        if color is not None:
+            if color.collidepoint(mousePos):
+                if not self.timer.activated:
+                    if mousePressed[0]:
+                        event()
+                        self.timer.activate()
+
+
+    def drawColours(self):    
+        red = (255,0,0)
+        self.red = pg.draw.rect(self.screen,red,(195,180,self.colorSize,self.colorSize))
+
+        green = (0,255,0)
+        self.green = pg.draw.rect(self.screen,green,(355,180,self.colorSize,self.colorSize))
+
+
+        blue = (0,0,255)
+        self.blue = pg.draw.rect(self.screen,blue,(35,180,self.colorSize,self.colorSize))
+
+        yellow = (255, 255, 0)
+        self.yellow = pg.draw.rect(self.screen,yellow,(515,180,self.colorSize,self.colorSize))
+    
+        
     def handleRendering(self,game):
         self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
         self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
         self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
 
+        
+        
         try:
-            self.currentPileCard = game.getCurrentPileCard()
-            self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
-            self.drawCard = self.screen.blit(self.blankCard,(410,190))
+            if self.renderColours:
+                self.drawColours()
+            else:
+                self.currentPileCard = game.getCurrentPileCard()
+                self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
+                self.drawCard = self.screen.blit(self.blankCard,(410,190))
 
-            
+                
             playerDeckSize : int = len(game.player1Deck if self.playerID == 0 else game.player2Deck)
             for i in range(playerDeckSize):
 
@@ -119,11 +167,11 @@ class Ui:
 
                 playerCardColours = game.player1Deck[i][CardData.Color.value] if self.playerID == 0 else game.player2Deck[i][CardData.Color.value]
                 playerCardValues = str(game.player1Deck[i][CardData.Value.value]) if self.playerID == 0 else str(game.player2Deck[i][CardData.Value.value])
-                
+                    
                 self.playerDeck[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
                                 (x,self.p1DeckPosY))
+                    
                 
-            
             player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
             for j in range(player2DeckSize):
 
@@ -133,10 +181,11 @@ class Ui:
 
                 self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
-            
+                
         except:
             pass
-
+        
+        
         
         
 
