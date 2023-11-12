@@ -91,7 +91,9 @@ class Game:
     
     def addPlusTwoCardStreak(self):
         self.cardDrawStreak += 2
-        print(self.cardDrawStreak)
+    
+    def addPlusFourCardStreak(self):
+        self.cardDrawStreak += 4
 
     def updatePlayerData(self,player,data):
         try:

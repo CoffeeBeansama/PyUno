@@ -56,6 +56,8 @@ class Server:
                                game.drawMultipleCards(player)
                            elif data == "Plus Two":
                                game.addPlusTwoCardStreak()
+                           elif data == "Plus Four":
+                               game.addPlusFourCardStreak()
                            elif data == "Ready":
                                 game.playerReady(player)
                            elif data == "Game Begin":
@@ -83,7 +85,7 @@ class Server:
         
         print("Connection lost")
         conn.close()
-
+    
     def run(self):
         while True:
             conn,addr = self._socket.accept()
