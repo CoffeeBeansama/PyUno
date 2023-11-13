@@ -22,7 +22,8 @@ class CardUi:
         self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
         self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize).convert_alpha()
 
-        self.playerDeck = {}
+        self.playerDeckCards = {}
+        self.playerDeckCardsMask = {}
 
         self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
         self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
@@ -44,8 +45,11 @@ class CardUi:
         self.transitionSprite.set_alpha(0)
         self.transitioned = False
 
+
+        
         self.importCardSprites()
 
+        
         self.timer = Timer(300)
 
         
@@ -72,12 +76,24 @@ class CardUi:
         self.deckBGHeight = 160
 
         self.deletedCard = None
+
+        self.mouse = pg.Surface((10,10))
+        self.mouse.fill((255,0,0))
+        self.mouseMask = pg.mask.from_surface(self.mouse)
+        self.mouseMaskImage = self.mouseMask.to_surface()
     
 
     def importCardSprites(self):
+        
 
         self.cardSpritePath = "Sprites/Uno Game Assets/"
+
         self.cardSprites = {
+            "Blue" : {} ,"Red" : {}, "Yellow": {}, "Green": {},
+            "WildCards": {}
+        }
+
+        self.cardSpriteMask = {
             "Blue" : {} ,"Red" : {}, "Yellow": {}, "Green": {},
             "WildCards": {}
         }
@@ -91,12 +107,17 @@ class CardUi:
     def getColorCards(self,color):
         for sprites in self.colorCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120)).convert_alpha()
+            self.cardSpriteMask[color][sprites] = pg.mask.from_surface(self.cardSprites[color][sprites])
 
         
     def getWildCards(self,color):
         for sprites in self.wildCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
-    
+            self.cardSpriteMask[color][sprites] = pg.mask.from_surface(self.cardSprites[color][sprites])
+
+
+        
+
     def displayFPS(self):
          fps = self.font.render(f"{round(self.clock.get_fps())}",True,(255,255,255))
          pos = (670,10)
@@ -112,7 +133,9 @@ class CardUi:
         mousePos = pg.mouse.get_pos()
         mousePressed = pg.mouse.get_pressed()
 
-        for data,cardsUi in self.playerDeck.items():
+        
+
+        for data,cardsUi in self.playerDeckCards.items():
                 if cardsUi.collidepoint(mousePos):
                     if mousePressed[0]:
                         if not self.timer.activated:
@@ -121,8 +144,8 @@ class CardUi:
                             self.timer.activate()
 
         if self.deletedCard is not None:
-            if self.deletedCard in self.playerDeck.keys():
-                del self.playerDeck[self.deletedCard]
+            if self.deletedCard in self.playerDeckCards.keys():
+                del self.playerDeckCards[self.deletedCard]
                 self.deletedCard = None    
                 
 
@@ -139,6 +162,7 @@ class CardUi:
         self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
         
+
         
         if turn == playerID:
             pg.draw.rect(self.screen,(255,255,255),(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
@@ -166,9 +190,13 @@ class CardUi:
                 playerCardColours = game.player1Deck[i][CardData.Color.value] if self.playerID == 0 else game.player2Deck[i][CardData.Color.value]
                 playerCardValues = str(game.player1Deck[i][CardData.Value.value]) if self.playerID == 0 else str(game.player2Deck[i][CardData.Value.value])
                     
-                self.playerDeck[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
+                self.playerDeckCards[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
                                 (x,self.p1DeckPosY))
                     
+                self.playerDeckCardsMask[(playerCardColours,playerCardValues)] = self.cardSpriteMask[playerCardColours][playerCardValues]
+
+                print(self.playerDeckCardsMask)
+
                 
             player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
             for j in range(player2DeckSize):
