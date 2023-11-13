@@ -3,6 +3,7 @@ from support import loadSprite
 from settings import *
 from timer import Timer
 
+
 class CardUi:
     def __init__(self,clock,playerID,playerTurn,drawSingleCard):
         self.screen = pg.display.get_surface()
@@ -14,6 +15,7 @@ class CardUi:
 
         pg.font.init()
 
+
         self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
 
         self.cardsSize = (80,120)
@@ -23,7 +25,7 @@ class CardUi:
         self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize).convert_alpha()
 
         self.playerDeckCards = {}
-        self.playerDeckCardsMask = {}
+      
 
         self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
         self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
@@ -46,10 +48,8 @@ class CardUi:
         self.transitioned = False
 
 
-        
         self.importCardSprites()
 
-        
         self.timer = Timer(300)
 
         
@@ -77,15 +77,13 @@ class CardUi:
 
         self.deletedCard = None
 
-        self.mouse = pg.Surface((10,10))
-        self.mouse.fill((255,0,0))
-        self.mouseMask = pg.mask.from_surface(self.mouse)
-        self.mouseMaskImage = self.mouseMask.to_surface()
-    
+        self.unoSprite = loadSprite("Sprites/Uno.png",(150,90)).convert_alpha()
+        self.unoSpriteRect = self.unoSprite.get_rect(topleft=(540,200))
 
+        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+
+       
     def importCardSprites(self):
-        
-
         self.cardSpritePath = "Sprites/Uno Game Assets/"
 
         self.cardSprites = {
@@ -107,17 +105,13 @@ class CardUi:
     def getColorCards(self,color):
         for sprites in self.colorCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120)).convert_alpha()
-            self.cardSpriteMask[color][sprites] = pg.mask.from_surface(self.cardSprites[color][sprites])
-
+            
+            
         
     def getWildCards(self,color):
         for sprites in self.wildCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
-            self.cardSpriteMask[color][sprites] = pg.mask.from_surface(self.cardSprites[color][sprites])
-
-
-        
-
+            
     def displayFPS(self):
          fps = self.font.render(f"{round(self.clock.get_fps())}",True,(255,255,255))
          pos = (670,10)
@@ -127,22 +121,27 @@ class CardUi:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
+    def playerUno(self,playerDeckCards,player2DeckSize):
+        if playerDeckCards <= 1:
+            return True
+        elif player2DeckSize <= 1:
+            return True
+        return False
 
     def handleUiEvent(self):
         self.timer.update()
         mousePos = pg.mouse.get_pos()
         mousePressed = pg.mouse.get_pressed()
 
-        
-
         for data,cardsUi in self.playerDeckCards.items():
-                if cardsUi.collidepoint(mousePos):
-                    if mousePressed[0]:
-                        if not self.timer.activated:
-                            self.playerTurn(data[0],data[1])
-                            self.deletedCard = data
-                            self.timer.activate()
-
+            if cardsUi.collidepoint(mousePos):
+                if mousePressed[0]:
+                    if not self.timer.activated:
+                        self.playerTurn(data[0],data[1])
+                        self.deletedCard = data
+                        self.timer.activate()
+        
+    
         if self.deletedCard is not None:
             if self.deletedCard in self.playerDeckCards.keys():
                 del self.playerDeckCards[self.deletedCard]
@@ -161,8 +160,8 @@ class CardUi:
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
-        
 
+        
         
         if turn == playerID:
             pg.draw.rect(self.screen,(255,255,255),(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
@@ -193,11 +192,8 @@ class CardUi:
                 self.playerDeckCards[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
                                 (x,self.p1DeckPosY))
                     
-                self.playerDeckCardsMask[(playerCardColours,playerCardValues)] = self.cardSpriteMask[playerCardColours][playerCardValues]
-
-                print(self.playerDeckCardsMask)
-
                 
+
             player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
             for j in range(player2DeckSize):
 
@@ -207,9 +203,15 @@ class CardUi:
 
                 self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
-                
+            
+            if self.playerUno(playerDeckSize,player2DeckSize):
+                self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+
+               
         except:
             pass
+                
+       
         
         
         

@@ -36,6 +36,7 @@ class Game:
 
         p1Pos = (175,100)
         p2Pos = (287,100)
+
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
@@ -92,7 +93,7 @@ class Game:
                 self.game = self.network.send("Draw Multiple Cards")
 
     def playerTurn(self,color,value):
-        
+        print((value,color))
         if self.game.getCurrentTurn() == self.playerID:
 
             if self.game.getCurrentPileCard()[CardData.Value.value] == value and self.game.getCurrentDrawStreak() <= 0:
@@ -121,11 +122,7 @@ class Game:
                 self.game = self.network.send(str(self.gameData))
 
             
-            
-
-           
-    
-
+        
     def sendUiEvent(self,value,color):
         if value == "Draw":
             self.gameData["PlayerTurn"] = (value,color)
@@ -165,10 +162,6 @@ class Game:
                 self.gameData["Player"] = self.player.data
                 self.network.send(str(self.gameData))
             
-           
-            
-
-                
             try:
                 match self.playerID:
                     case 0:
