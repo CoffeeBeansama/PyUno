@@ -76,7 +76,6 @@ class Game:
     def setColor(self,color):
         self.game = self.network.send(color)
      
-
     def playerIn(self):
         self.playerReady = True
         self.game = self.network.send("Ready")
@@ -96,7 +95,6 @@ class Game:
         
         if self.game.getCurrentTurn() == self.playerID:
 
-            print((value,color))
             if self.game.getCurrentPileCard()[CardData.Value.value] == value and self.game.getCurrentDrawStreak() <= 0:
                 self.sendUiEvent(value,color)
                     

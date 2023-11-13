@@ -70,6 +70,8 @@ class CardUi:
 
         self.deckBGWidth = 670
         self.deckBGHeight = 160
+
+        self.deletedCard = None
     
 
     def importCardSprites(self):
@@ -115,8 +117,15 @@ class CardUi:
                     if mousePressed[0]:
                         if not self.timer.activated:
                             self.playerTurn(data[0],data[1])
+                            self.deletedCard = data
                             self.timer.activate()
-                        
+
+        if self.deletedCard is not None:
+            if self.deletedCard in self.playerDeck.keys():
+                del self.playerDeck[self.deletedCard]
+                self.deletedCard = None    
+                
+
         if self.drawCard.collidepoint(mousePos):
             if not self.timer.activated:
                 if mousePressed[0]:
@@ -129,6 +138,7 @@ class CardUi:
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
+        
         
         if turn == playerID:
             pg.draw.rect(self.screen,(255,255,255),(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
