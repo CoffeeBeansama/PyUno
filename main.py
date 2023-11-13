@@ -40,7 +40,7 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
+        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard,self.playerUno)
         self.colorUi = ColorUi(self.setColor)
 
         self.gameData = {
@@ -93,7 +93,7 @@ class Game:
                 self.game = self.network.send("Draw Multiple Cards")
 
     def playerTurn(self,color,value):
-        print((value,color))
+        #print((value,color))
         if self.game.getCurrentTurn() == self.playerID:
 
             if self.game.getCurrentPileCard()[CardData.Value.value] == value and self.game.getCurrentDrawStreak() <= 0:
@@ -132,7 +132,31 @@ class Game:
             self.gameData["PlayerTurn"] = (value,color)
             self.game = self.network.send(str(self.gameData))
 
-                
+    def checkPlayerUno(self):
+        playerDeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
+        player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
+
+        if playerDeckSize <= 1:
+            return True
+        elif player2DeckSize <= 1:
+            return True
+        return False
+
+    def playerUno(self):
+        playerDeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
+        player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
+
+        if self.playerID == 0:
+            if playerDeckSize <= 1:
+                pass
+            elif player2DeckSize <= 1:
+                pass
+        elif self.playerID == 1:
+            
+            if playerDeckSize <= 1:
+                pass
+            elif player2DeckSize <= 1:
+                pass
 
     def run(self):
         while self.running:
@@ -156,12 +180,17 @@ class Game:
 
                 self.colorUi.drawColours()
                 self.colorUi.handleUiEvent()
+                
+                if self.checkPlayerUno() == True:
+                    self.cardUi.renderUno()
 
             else:
                 self.visibleSprites.custom_draw(self.player)
                 self.gameData["Player"] = self.player.data
                 self.network.send(str(self.gameData))
             
+            
+
             try:
                 match self.playerID:
                     case 0:

@@ -124,6 +124,9 @@ class Game:
                         self.incrementTurn()
         except:
             pass
+    
+    def playerUno(self):
+        pass
 
     def getPlayerOneData(self):
         return self.data["PlayerOne"]

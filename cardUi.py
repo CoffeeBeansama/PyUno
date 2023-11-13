@@ -5,15 +5,15 @@ from timer import Timer
 
 
 class CardUi:
-    def __init__(self,clock,playerID,playerTurn,drawSingleCard):
+    def __init__(self,clock,playerID,playerTurn,drawSingleCard,playerUno):
         self.screen = pg.display.get_surface()
+        pg.font.init()
 
         self.clock = clock
         self.playerID = playerID
         self.playerTurn = playerTurn
         self.drawSingleCard = drawSingleCard
-
-        pg.font.init()
+        self.playerUno = playerUno
 
 
         self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
@@ -121,12 +121,7 @@ class CardUi:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
-    def playerUno(self,playerDeckCards,player2DeckSize):
-        if playerDeckCards <= 1:
-            return True
-        elif player2DeckSize <= 1:
-            return True
-        return False
+    
 
     def handleUiEvent(self):
         self.timer.update()
@@ -149,20 +144,26 @@ class CardUi:
                 
 
         if self.drawCard.collidepoint(mousePos):
-            if not self.timer.activated:
-                if mousePressed[0]:
-                    if not self.timer.activated:
-                        self.drawSingleCard()
-                        self.timer.activate()
-                        self.timer.activate()
+            if mousePressed[0]:
+                if not self.timer.activated:
+                    self.drawSingleCard()
+                    self.timer.activate()
+                    
 
-        
+        if self.unoUi.collidepoint(mousePos):
+            if mousePressed[0]:
+                if not self.timer.activated:
+                    self.playerUno()
+                    self.timer.activate()
+
+    
+    def renderUno(self):
+        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
 
-        
-        
         if turn == playerID:
             pg.draw.rect(self.screen,(255,255,255),(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
             self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
@@ -204,8 +205,8 @@ class CardUi:
                 self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
             
-            if self.playerUno(playerDeckSize,player2DeckSize):
-                self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+            
+                
 
                
         except:
