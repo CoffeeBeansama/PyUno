@@ -62,6 +62,8 @@ class Server:
                                 game.playerReady(player)
                            elif data == "Game Begin":
                                game.roundBegin()
+                           elif data == "Called Uno":
+                               game.calledUno(player)
                            elif data in ["Red","Blue","Green","Yellow"]:
                                game.setCurrentColor(data)
                            else:

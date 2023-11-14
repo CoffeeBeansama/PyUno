@@ -27,6 +27,10 @@ class Game:
         self.turn = 0
         self.cardDrawStreak = 0
 
+        self.uno = False
+
+        self.startingCards = 3
+
         
 
         self.createCards()
@@ -59,10 +63,10 @@ class Game:
         
     
     def roundBegin(self):
-        for cards in self.cardDeck[:7]:
+        for cards in self.cardDeck[:self.startingCards]:
             self.player1Deck.append(cards)
             self.cardDeck.remove(cards)
-        for cards in self.cardDeck[:7]:
+        for cards in self.cardDeck[:self.startingCards]:
             self.player2Deck.append(cards)
             self.cardDeck.remove(cards)
         
@@ -105,6 +109,14 @@ class Game:
         self.cardDrawStreak += 4
 
     def updatePlayerData(self,player,data):
+        player1DeckSize : int = len(self.player1Deck)
+        player2DeckSize : int = len(self.player2Deck)
+
+        if player1DeckSize >= 2:
+            self.uno = False
+        if player2DeckSize >= 2:
+            self.uno = False
+        
         try:
             if player == 0:
                 player1Data = ast.literal_eval(str(data))
@@ -122,11 +134,41 @@ class Game:
                         self.pile.append(player2Data["PlayerTurn"])
                         self.player2Deck.remove(player2Data["PlayerTurn"])
                         self.incrementTurn()
+                
         except:
             pass
     
-    def playerUno(self):
-        pass
+    def gameUno(self):
+        return self.uno
+    
+    def calledUno(self,player):
+        player1DeckSize : int = len(self.player1Deck)
+        player2DeckSize : int = len(self.player2Deck)
+
+        if player == 0:
+            if player1DeckSize <= 1:
+                self.uno = True
+                
+            if player2DeckSize == 1:
+                self.drawTwoCards(self.player2Deck)
+            
+
+        elif player == 1:
+            if player2DeckSize <= 1:
+                self.uno = True
+
+            if player1DeckSize == 1:
+                self.drawTwoCards(self.player1Deck)
+            
+
+        
+        
+
+    def drawTwoCards(self,playerDeck):
+        for i in range(0,2):
+            playerDeck.append(self.cardDeck[i])
+            self.cardDeck.pop(i)
+        self.uno = True
 
     def getPlayerOneData(self):
         return self.data["PlayerOne"]

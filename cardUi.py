@@ -121,7 +121,6 @@ class CardUi:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
-    
 
     def handleUiEvent(self):
         self.timer.update()
@@ -150,15 +149,20 @@ class CardUi:
                     self.timer.activate()
                     
 
+    def renderUno(self):
+        mousePos = pg.mouse.get_pos()
+        mousePressed = pg.mouse.get_pressed()
+
+        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+
+        
         if self.unoUi.collidepoint(mousePos):
             if mousePressed[0]:
                 if not self.timer.activated:
                     self.playerUno()
                     self.timer.activate()
 
-    
-    def renderUno(self):
-        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
+        
 
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
