@@ -48,28 +48,8 @@ class Server:
                         break
                     else:
                         if data != "get":
-                           if data == "PlayerTurn":
-                               game.incrementTurn()
-                           elif data == "Draw Single Card":
-                               game.drawSingleCard(player)
-                           elif data == "Draw Multiple Cards":
-                               game.drawMultipleCards(player)
-                           elif data == "Plus Two":
-                               game.addPlusTwoCardStreak()
-                           elif data == "Plus Four":
-                               game.addPlusFourCardStreak()
-                           elif data == "Ready":
-                                game.playerReady(player)
-                           elif data == "Game Begin":
-                               game.roundBegin()
-                           elif data == "Called Uno":
-                               game.calledUno(player)
-                           elif data in ["Red","Blue","Green","Yellow"]:
-                               game.setCurrentColor(data)
-                           else:
-                                game.updatePlayerData(player,data)
+                           game.processData(player,data)
                                 
-                           
                         conn.sendall(pickle.dumps(game))
                 else:
                     break
