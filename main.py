@@ -28,6 +28,7 @@ class Game:
 
         try:
             self.playerID = int(self.network.getPlayerID())
+            print(self.playerID)
         except:
             pass
         
@@ -81,7 +82,6 @@ class Game:
         self.playerReady = True
         self.game = self.network.send("Ready")
         if self.game.bothPlayersReady():
-            self.network.send("Game Begin")
             self.battleBegin = True
             return
     
@@ -139,14 +139,13 @@ class Game:
         if player1DeckSize == 1:
             return True
         elif player2DeckSize == 1:
-            return True
+            return True 
         return False
 
     def calledUno(self):
         self.game = self.network.send("Called Uno")
         
        
-
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -170,10 +169,17 @@ class Game:
                 self.colorUi.drawColours()
                 self.colorUi.handleUiEvent()
                 
+                
                 if self.checkPlayerUno():
                     if not self.game.gameUno():
                         self.cardUi.renderUno()
 
+                if self.game.playerWon() is not None:
+                    if self.game.playerWon() == self.playerID:
+                        print("You won!")
+                    else:
+                        print("You lose!")
+                    
             else:
                 self.visibleSprites.custom_draw(self.player)
                 self.gameData["Player"] = self.player.data

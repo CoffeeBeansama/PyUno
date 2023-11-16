@@ -49,7 +49,7 @@ class Server:
                     else:
                         if data != "get":
                            game.processData(player,data)
-                                
+                           
                         conn.sendall(pickle.dumps(game))
                 else:
                     break

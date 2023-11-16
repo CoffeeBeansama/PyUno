@@ -106,8 +106,6 @@ class CardUi:
         for sprites in self.colorCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120)).convert_alpha()
             
-            
-        
     def getWildCards(self,color):
         for sprites in self.wildCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
@@ -209,10 +207,6 @@ class CardUi:
                 self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
             
-            
-                
-
-               
         except:
             pass
                 

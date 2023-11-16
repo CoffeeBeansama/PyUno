@@ -29,7 +29,7 @@ class Game:
 
         self.uno = False
 
-        self.startingCards = 3
+        self.startingCards = 2
 
         self.createCards()
 
@@ -42,7 +42,6 @@ class Game:
             "Plus Two" : self.addPlusTwoCardStreak,
             "Plus Four" : self.addPlusFourCardStreak,
             "Ready" : self.playerReady,
-            "Game Begin" : self.roundBegin,
             "Called Uno" : self.calledUno,
             "Blue" : self.setCurrentColor,
             "Red" : self.setCurrentColor,
@@ -50,6 +49,8 @@ class Game:
             "Yellow" : self.setCurrentColor
 
         }
+
+        self.roundBegin(player=None,data=None)
 
     def createColorCards(self,color):
         for i in range(2):
@@ -109,11 +110,12 @@ class Game:
         processedData(player,data)
 
     def playerReady(self,player,data):
-        match player:
-            case 0:
-                self.playersReady[0] = True
-            case 1:
-                self.playersReady[1] = True
+        if player == 0:
+            self.playersReady[0] = True
+        elif player == 1:
+            self.playersReady[1] = True
+
+                
 
     def drawMultipleCards(self,player,data):
         for i in range(0,self.cardDrawStreak):
@@ -125,7 +127,7 @@ class Game:
                 self.cardDeck.pop(i)
                 
         self.cardDrawStreak = 0
-        self.incrementTurn(player,data)
+        self.incrementTurn()
 
     def setCurrentColor(self,player,data):
         self.currentColor = data
@@ -147,7 +149,7 @@ class Game:
                     if player1Data["PlayerTurn"] in self.player1Deck:
                         self.pile.append(player1Data["PlayerTurn"])
                         self.player1Deck.remove(player1Data["PlayerTurn"])
-                        self.incrementTurn(player,data)
+                        self.incrementTurn()
             elif player == 1:
                 player2Data = ast.literal_eval(str(data))
                 self.data["PlayerTwo"] = player2Data["Player"]
@@ -155,7 +157,7 @@ class Game:
                     if player2Data["PlayerTurn"] in self.player2Deck:
                         self.pile.append(player2Data["PlayerTurn"])
                         self.player2Deck.remove(player2Data["PlayerTurn"])
-                        self.incrementTurn(player,data)
+                        self.incrementTurn()
         except:
             pass
 
@@ -165,10 +167,11 @@ class Game:
     def addPlusFourCardStreak(self,player,data):
         self.cardDrawStreak += 4
     
-    def incrementTurn(self,player,data):
+    def incrementTurn(self):
         self.turn += 1
         if self.turn >= 2:
             self.turn = 0
+        
         
     def drawSingleCard(self,player,data):
         if player == 0:
@@ -177,7 +180,7 @@ class Game:
         elif player == 1:
             self.player2Deck.append(self.cardDeck[0])
             self.cardDeck.pop(0)
-        self.incrementTurn(player,data)
+        self.incrementTurn()
     
     def roundBegin(self,player,data):
         for cards in self.cardDeck[:self.startingCards]:
@@ -196,33 +199,27 @@ class Game:
         self.currentColor = self.pile[0][CardData.Color.value]
         return
     
-    def roundBegin(self,player,data):
-        for cards in self.cardDeck[:self.startingCards]:
-            self.player1Deck.append(cards)
-            self.cardDeck.remove(cards)
-        for cards in self.cardDeck[:self.startingCards]:
-            self.player2Deck.append(cards)
-            self.cardDeck.remove(cards)
+    def playerWon(self):
+        player1DeckSize : int = len(self.player1Deck)
+        player2DeckSize : int = len(self.player2Deck)
+
+        if player1DeckSize <= 0:
+            return 0
+        elif player2DeckSize <= 0:
+            return 1
         
-        for index,item in enumerate(self.cardDeck):
-            if item[CardData.Value.value] not in ["Wild","WildDraw"]:
-                self.pile.append(item)
-                self.cardDeck.pop(index)
-                return
-        
-        self.currentColor = self.pile[0][CardData.Color.value]
-        return
+        return None
     
     def calledUno(self,player,data):
         player1DeckSize : int = len(self.player1Deck)
         player2DeckSize : int = len(self.player2Deck)
         if player == 0:
-            if player1DeckSize <= 1:
+            if player1DeckSize == 1:
                 self.uno = True
             if player2DeckSize == 1:
                 self.drawTwoCards(self.player2Deck)
         elif player == 1:
-            if player2DeckSize <= 1:
+            if player2DeckSize == 1:
                 self.uno = True
             if player1DeckSize == 1:
                 self.drawTwoCards(self.player1Deck)
