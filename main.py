@@ -144,8 +144,47 @@ class Game:
 
     def calledUno(self):
         self.game = self.network.send("Called Uno")
-        
+    
+    def handleBattleSystem(self):
+        self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
+        self.cardUi.handleUiEvent()
+
+        self.colorUi.drawColours()
+        self.colorUi.handleUiEvent()
+                
+        if self.checkPlayerUno():
+            if not self.game.gameUno():
+                self.cardUi.renderUno()
+
+        if self.game.playerWon() is not None:
+            if self.game.playerWon() == self.playerID:
+                print("You won!")
+            else:
+                print("You lose!")
        
+    def handleOverWorld(self):
+        self.visibleSprites.custom_draw(self.player)
+        self.gameData["Player"] = self.player.data
+        self.network.send(str(self.gameData))
+
+    def getPlayer2Data(self):
+        try:
+            match self.playerID:
+                case 0:
+                        data = self.game.getPlayerTwoData()
+                        self.player2.handlePlayer2Movement(
+                                data[PlayerData.Position.value],
+                                data[PlayerData.FrameIndex.value],
+                                data[PlayerData.State.value])
+                case 1:
+                        data = self.game.getPlayerOneData()
+                        self.player2.handlePlayer2Movement(
+                                data[PlayerData.Position.value],
+                                data[PlayerData.FrameIndex.value],
+                                data[PlayerData.State.value])
+        except:
+            pass
+
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -160,49 +199,15 @@ class Game:
             if not self.playerReady:
                 self.player.update()
 
-            
             if self.game.bothPlayersReady():
-
-                self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
-                self.cardUi.handleUiEvent()
-
-                self.colorUi.drawColours()
-                self.colorUi.handleUiEvent()
-                
-                
-                if self.checkPlayerUno():
-                    if not self.game.gameUno():
-                        self.cardUi.renderUno()
-
-                if self.game.playerWon() is not None:
-                    if self.game.playerWon() == self.playerID:
-                        print("You won!")
-                    else:
-                        print("You lose!")
-                    
+                self.handleBattleSystem()
             else:
-                self.visibleSprites.custom_draw(self.player)
-                self.gameData["Player"] = self.player.data
-                self.network.send(str(self.gameData))
-            
-            try:
-                match self.playerID:
-                    case 0:
-                            data = self.game.getPlayerTwoData()
-                            self.player2.handlePlayer2Movement(
-                                    data[PlayerData.Position.value],
-                                    data[PlayerData.FrameIndex.value],
-                                    data[PlayerData.State.value])
-                    case 1:
-                            data = self.game.getPlayerOneData()
-                            self.player2.handlePlayer2Movement(
-                                    data[PlayerData.Position.value],
-                                    data[PlayerData.FrameIndex.value],
-                                    data[PlayerData.State.value])
-            except:
-                pass
+                self.handleOverWorld()
+                
+            self.getPlayer2Data()
 
             self.cardUi.displayFPS()
+
             pg.display.update()
             self.clock.tick(self.FPS)
 

@@ -35,6 +35,12 @@ class Game:
 
         self.currentColor = None
 
+        self.createData()
+
+
+        self.roundBegin(player=None,data=None)
+
+    def createData(self):
         self.sortedData = {
             "PlayerTurn" : self.incrementTurn,
             "Draw Single Card" : self.drawSingleCard,
@@ -47,10 +53,7 @@ class Game:
             "Red" : self.setCurrentColor,
             "Green" : self.setCurrentColor,
             "Yellow" : self.setCurrentColor
-
         }
-
-        self.roundBegin(player=None,data=None)
 
     def createColorCards(self,color):
         for i in range(2):
@@ -132,6 +135,14 @@ class Game:
     def setCurrentColor(self,player,data):
         self.currentColor = data
 
+    def handlePlayerTurn(self,chosenCard,playerDeck):
+        if chosenCard is not None:
+            if chosenCard in playerDeck:
+                self.pile.append(chosenCard)
+                playerDeck.remove(chosenCard)
+                self.incrementTurn()
+
+
     def updatePlayerData(self,player,data):
         player1DeckSize : int = len(self.player1Deck)
         player2DeckSize : int = len(self.player2Deck)
@@ -145,19 +156,14 @@ class Game:
             if player == 0:
                 player1Data = ast.literal_eval(str(data))
                 self.data["PlayerOne"] = player1Data["Player"]
-                if player1Data["PlayerTurn"] is not None:
-                    if player1Data["PlayerTurn"] in self.player1Deck:
-                        self.pile.append(player1Data["PlayerTurn"])
-                        self.player1Deck.remove(player1Data["PlayerTurn"])
-                        self.incrementTurn()
+                self.handlePlayerTurn(player1Data["PlayerTurn"],self.player1Deck)
+                
+
             elif player == 1:
                 player2Data = ast.literal_eval(str(data))
                 self.data["PlayerTwo"] = player2Data["Player"]
-                if player2Data["PlayerTurn"] is not None:
-                    if player2Data["PlayerTurn"] in self.player2Deck:
-                        self.pile.append(player2Data["PlayerTurn"])
-                        self.player2Deck.remove(player2Data["PlayerTurn"])
-                        self.incrementTurn()
+                self.handlePlayerTurn(player2Data["PlayerTurn"],self.player2Deck)
+                
         except:
             pass
 
@@ -214,12 +220,12 @@ class Game:
         player1DeckSize : int = len(self.player1Deck)
         player2DeckSize : int = len(self.player2Deck)
         if player == 0:
-            if player1DeckSize == 1:
+            if player1DeckSize <= 1:
                 self.uno = True
             if player2DeckSize == 1:
                 self.drawTwoCards(self.player2Deck)
         elif player == 1:
-            if player2DeckSize == 1:
+            if player2DeckSize <= 1:
                 self.uno = True
             if player1DeckSize == 1:
                 self.drawTwoCards(self.player1Deck)
