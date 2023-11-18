@@ -157,10 +157,11 @@ class Game:
                 self.cardUi.renderUno()
 
         if self.game.playerWon() is not None:
-            if self.game.playerWon() == self.playerID:
-                print("You won!")
+            playerWon = self.game.playerWon() == self.playerID
+            if playerWon:
+                self.cardUi.renderPlayerWon(playerWon)
             else:
-                print("You lose!")
+                self.cardUi.renderPlayerWon(playerWon)
        
     def handleOverWorld(self):
         self.visibleSprites.custom_draw(self.player)

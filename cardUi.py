@@ -15,8 +15,10 @@ class CardUi:
         self.drawSingleCard = drawSingleCard
         self.playerUno = playerUno
 
-
-        self.font = pg.font.Font("Fonts/DeterminationMonoWebRegular-Z5oq.ttf",18)
+        self.fontColor = (255,255,255)
+        fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
+        self.fpsFont = pg.font.Font(fontPath,18)
+        self.gameFont = pg.font.Font(fontPath,64)
 
         self.cardsSize = (80,120)
         self.startingCards = 7
@@ -111,7 +113,8 @@ class CardUi:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
             
     def displayFPS(self):
-         fps = self.font.render(f"{round(self.clock.get_fps())}",True,(255,255,255))
+         
+         fps = self.fpsFont.render(f"{round(self.clock.get_fps())}",True,self.fontColor)
          pos = (670,10)
          self.screen.blit(fps,pos)
 
@@ -119,6 +122,15 @@ class CardUi:
     def displayCards(self):
         self.screen.blit(self.blankCard,(100,100))
        
+    def renderPlayerWon(self,win):
+        if win:
+            pos = (230,370)
+            status = self.gameFont.render("You Win!",True,self.fontColor)
+        else:
+            pos = (160,40)
+            status = self.gameFont.render("Player 2 Win!",True,self.fontColor)
+        
+        self.screen.blit(status,pos)
 
     def handleUiEvent(self):
         self.timer.update()
