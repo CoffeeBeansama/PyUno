@@ -9,6 +9,7 @@ from interactables import *
 from settings import *
 from cardUi import CardUi
 from colorUi import ColorUi
+from unoUi import UnoUi
 
 class Game:
     def __init__(self):
@@ -41,8 +42,9 @@ class Game:
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
 
-        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard,self.calledUno)
+        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
         self.colorUi = ColorUi(self.setColor)
+        self.unoUi = UnoUi(self.calledUno)
 
         self.gameData = {
             "Player" : {},
@@ -93,34 +95,33 @@ class Game:
                 self.game = self.network.send("Draw Multiple Cards")
 
     def playerTurn(self,color,value):
-        #print((value,color))
         if self.game.getCurrentTurn() == self.playerID:
+            
+            if self.game.getCurrentDrawStreak() <= 0:
+                hasSameAttribute = self.game.getCurrentPileCard()[CardData.Value.value] == value or self.game.getCurrentPileCard()[CardData.Color.value] == color or color == self.game.getCurrrentColor()
 
-            if self.game.getCurrentPileCard()[CardData.Value.value] == value and self.game.getCurrentDrawStreak() <= 0:
-                self.sendUiEvent(value,color)
-                    
-            elif self.game.getCurrentPileCard()[CardData.Color.value] == color and self.game.getCurrentDrawStreak() <= 0:
-                self.sendUiEvent(value,color)
+                if hasSameAttribute:
+                    self.sendUiEvent(value,color)
 
-            elif color == self.game.getCurrrentColor() and self.game.getCurrentDrawStreak() <= 0:
-                self.sendUiEvent(value,color)
-
-            elif value == "WildDraw":
-                self.gameData["PlayerTurn"] = (value,color)
-                self.game = self.network.send("Plus Four")
-                self.game = self.network.send(str(self.gameData))
-                self.colorUi.renderColours = True
-
-            elif value == "Wild" and self.game.getCurrentDrawStreak() <= 0:
-                self.gameData["PlayerTurn"] = (value,color)
-                self.game = self.network.send(str(self.gameData))
-                self.colorUi.renderColours = True
+                elif value == "Wild":
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send(str(self.gameData))
+                    self.colorUi.renderColours = True
+                    self.sendUiEvent(value,color)
                 
-            elif value == "Draw" and self.game.getCurrentDrawStreak() > 0:
-                self.gameData["PlayerTurn"] = (value,color)
-                self.game = self.network.send("Plus Two")
-                self.game = self.network.send(str(self.gameData))
+            else:
+                if value == "Draw":
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send("Plus Two")
+                    self.game = self.network.send(str(self.gameData))
+                    self.sendUiEvent(value,color)
 
+            if value == "WildDraw":
+                    self.gameData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send("Plus Four")
+                    self.game = self.network.send(str(self.gameData))
+                    self.colorUi.renderColours = True
+                    self.sendUiEvent(value,color)
             
         
     def sendUiEvent(self,value,color):
@@ -154,14 +155,14 @@ class Game:
                 
         if self.checkPlayerUno():
             if not self.game.gameUno():
-                self.cardUi.renderUno()
+                self.unoUi.renderUno()
 
         if self.game.playerWon() is not None:
-            playerWon = self.game.playerWon() == self.playerID
-            if playerWon:
-                self.cardUi.renderPlayerWon(playerWon)
+            thisPlayerWon = self.game.playerWon() == self.playerID
+            if thisPlayerWon:
+                self.cardUi.renderPlayerWon(thisPlayerWon)
             else:
-                self.cardUi.renderPlayerWon(playerWon)
+                self.cardUi.renderPlayerWon(thisPlayerWon)
        
     def handleOverWorld(self):
         self.visibleSprites.custom_draw(self.player)

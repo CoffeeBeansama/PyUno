@@ -3,9 +3,8 @@ from support import loadSprite
 from settings import *
 from timer import Timer
 
-
 class CardUi:
-    def __init__(self,clock,playerID,playerTurn,drawSingleCard,playerUno):
+    def __init__(self,clock,playerID,playerTurn,drawSingleCard):
         self.screen = pg.display.get_surface()
         pg.font.init()
 
@@ -13,7 +12,7 @@ class CardUi:
         self.playerID = playerID
         self.playerTurn = playerTurn
         self.drawSingleCard = drawSingleCard
-        self.playerUno = playerUno
+    
 
         self.fontColor = (255,255,255)
         fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
@@ -28,7 +27,6 @@ class CardUi:
 
         self.playerDeckCards = {}
       
-
         self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
         self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
         self.playerDeckBG.set_alpha(240)
@@ -65,7 +63,6 @@ class CardUi:
         self.red = None
         self.yellow = None
 
-
         self.colorSize = 150
 
         self.playerDeckBGX = 15
@@ -79,12 +76,6 @@ class CardUi:
 
         self.deletedCard = None
 
-        self.unoSprite = loadSprite("Sprites/Uno.png",(150,90)).convert_alpha()
-        self.unoSpriteRect = self.unoSprite.get_rect(topleft=(540,200))
-
-        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
-
-       
     def importCardSprites(self):
         self.cardSpritePath = "Sprites/Uno Game Assets/"
 
@@ -113,7 +104,6 @@ class CardUi:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
             
     def displayFPS(self):
-         
          fps = self.fpsFont.render(f"{round(self.clock.get_fps())}",True,self.fontColor)
          pos = (670,10)
          self.screen.blit(fps,pos)
@@ -124,19 +114,15 @@ class CardUi:
        
     def renderPlayerWon(self,win):
         if win:
-            pos = (230,370)
+            pos = (230,375)
             status = self.gameFont.render("You Win!",True,self.fontColor)
         else:
-            pos = (160,40)
+            pos = (160,45)
             status = self.gameFont.render("Player 2 Win!",True,self.fontColor)
         
         self.screen.blit(status,pos)
 
-    def handleUiEvent(self):
-        self.timer.update()
-        mousePos = pg.mouse.get_pos()
-        mousePressed = pg.mouse.get_pressed()
-
+    def cardSelection(self,mousePos,mousePressed):
         for data,cardsUi in self.playerDeckCards.items():
             if cardsUi.collidepoint(mousePos):
                 if mousePressed[0]:
@@ -145,37 +131,29 @@ class CardUi:
                         self.deletedCard = data
                         self.timer.activate()
         
-    
         if self.deletedCard is not None:
             if self.deletedCard in self.playerDeckCards.keys():
                 del self.playerDeckCards[self.deletedCard]
                 self.deletedCard = None    
-                
 
+    def drawFromPile(self,mousePos,mousePressed):
         if self.drawCard.collidepoint(mousePos):
             if mousePressed[0]:
                 if not self.timer.activated:
                     self.drawSingleCard()
                     self.timer.activate()
+
+    def handleUiEvent(self):
+        self.timer.update()
+        self.cardSelection(self.mousePos,self.mousePressed)
+        self.drawFromPile(self.mousePos,self.mousePressed)
                     
-
-    def renderUno(self):
-        mousePos = pg.mouse.get_pos()
-        mousePressed = pg.mouse.get_pressed()
-
-        self.unoUi = self.screen.blit(self.unoSprite,self.unoSpriteRect)
-
-        
-        if self.unoUi.collidepoint(mousePos):
-            if mousePressed[0]:
-                if not self.timer.activated:
-                    self.playerUno()
-                    self.timer.activate()
-
-        
 
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
+        self.mousePos = pg.mouse.get_pos()
+        self.mousePressed = pg.mouse.get_pressed()
+
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
 
         if turn == playerID:
@@ -187,7 +165,6 @@ class CardUi:
             self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
             self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
             
-        
         try:
             
             self.currentPileCard = game.getCurrentPileCard()
