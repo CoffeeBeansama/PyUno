@@ -1,7 +1,7 @@
 import pygame as pg
 import random
 import ast
-from settings import CardData
+from settings import CardData,GameData
 
 class Game:
     def __init__(self,id):
@@ -222,13 +222,17 @@ class Game:
         if player == 0:
             if player1DeckSize <= 1:
                 self.uno = True
-            if player2DeckSize == 1:
+                return
+            elif player2DeckSize == 1:
                 self.drawTwoCards(self.player2Deck)
+                return
         elif player == 1:
             if player2DeckSize <= 1:
                 self.uno = True
-            if player1DeckSize == 1:
+                return
+            elif player1DeckSize == 1:
                 self.drawTwoCards(self.player1Deck)
+                return
 
     def drawTwoCards(self,playerDeck):
         for i in range(0,2):

@@ -137,10 +137,9 @@ class Game:
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
         player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
         
-        if player1DeckSize == 1:
+        if player1DeckSize == 1 or player2DeckSize == 1:
             return True
-        elif player2DeckSize == 1:
-            return True 
+        
         return False
 
     def calledUno(self):
