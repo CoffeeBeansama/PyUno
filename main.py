@@ -29,18 +29,17 @@ class Game:
 
         try:
             self.playerID = int(self.network.getPlayerID())
-            print(self.playerID)
+            p1Pos = (175,100)
+            p2Pos = (287,100)
+            self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
+            self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         except:
             pass
         
         self.playerReady = False
         self.battleBegin = False
 
-        p1Pos = (175,100)
-        p2Pos = (287,100)
-
-        self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
-        self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
+       
 
         self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
         self.colorUi = ColorUi(self.setColor)
@@ -98,9 +97,9 @@ class Game:
         if self.game.getCurrentTurn() == self.playerID:
             
             if self.game.getCurrentDrawStreak() <= 0:
-                hasSameAttribute = self.game.getCurrentPileCard()[CardData.Value.value] == value or self.game.getCurrentPileCard()[CardData.Color.value] == color or color == self.game.getCurrrentColor()
+                isSameAttribute = self.game.getCurrentPileCard()[CardData.Value.value] == value or self.game.getCurrentPileCard()[CardData.Color.value] == color or color == self.game.getCurrrentColor()
 
-                if hasSameAttribute:
+                if isSameAttribute:
                     self.sendUiEvent(value,color)
 
                 elif value == "Wild":
@@ -114,7 +113,7 @@ class Game:
                     self.gameData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Two")
                     self.game = self.network.send(str(self.gameData))
-                    self.sendUiEvent(value,color)
+                    
 
             if value == "WildDraw":
                     self.gameData["PlayerTurn"] = (value,color)
@@ -195,8 +194,11 @@ class Game:
 
             self.window.fill("black")
             
-            self.game = self.network.send("get")
-
+            try:
+                self.game = self.network.send("get")
+            except:
+                pass
+            
             if not self.playerReady:
                 self.player.update()
 

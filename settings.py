@@ -1,10 +1,8 @@
 from enum import Enum
 
 width,height = 700,500
-port = 5558
+port = 5556
 
-class GameData(Enum):
-    DrawSingleCard = 0
 
 class CardData(Enum):
     Value = 0

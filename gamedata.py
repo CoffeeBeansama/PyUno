@@ -1,7 +1,7 @@
 import pygame as pg
 import random
 import ast
-from settings import CardData,GameData
+from settings import CardData
 
 class Game:
     def __init__(self,id):
@@ -29,7 +29,7 @@ class Game:
 
         self.uno = False
 
-        self.startingCards = 2
+        self.startingCards = 7
 
         self.createCards()
 
@@ -52,7 +52,8 @@ class Game:
             "Blue" : self.setCurrentColor,
             "Red" : self.setCurrentColor,
             "Green" : self.setCurrentColor,
-            "Yellow" : self.setCurrentColor
+            "Yellow" : self.setCurrentColor,
+            
         }
 
     def createColorCards(self,color):
@@ -118,7 +119,6 @@ class Game:
         elif player == 1:
             self.playersReady[1] = True
 
-                
 
     def drawMultipleCards(self,player,data):
         for i in range(0,self.cardDrawStreak):
@@ -132,15 +132,15 @@ class Game:
         self.cardDrawStreak = 0
         self.incrementTurn()
 
-    def setCurrentColor(self,player,data):
-        self.currentColor = data
+    
 
     def handlePlayerTurn(self,chosenCard,playerDeck):
         if chosenCard is not None:
             if chosenCard in playerDeck:
                 self.pile.append(chosenCard)
                 playerDeck.remove(chosenCard)
-                self.incrementTurn()
+                if chosenCard[0] not in ["Skip","Reverse","Wild","WildDraw"]:
+                    self.incrementTurn()
 
 
     def updatePlayerData(self,player,data):
@@ -233,6 +233,10 @@ class Game:
             elif player1DeckSize == 1:
                 self.drawTwoCards(self.player1Deck)
                 return
+            
+    def setCurrentColor(self,player,data):
+        self.currentColor = data
+        self.incrementTurn()
 
     def drawTwoCards(self,playerDeck):
         for i in range(0,2):
