@@ -10,6 +10,7 @@ from settings import *
 from cardUi import CardUi
 from colorUi import ColorUi
 from unoUi import UnoUi
+from menu import MainMenu
 
 class Game:
     def __init__(self):
@@ -21,7 +22,7 @@ class Game:
         self.FPS = 60
         self.clock = pg.time.Clock()
 
-        
+        self.mainMenu = MainMenu()
         self.network = Network()
         self.visibleSprites = CameraGroup()
         self.collisionSprites = pg.sprite.Group()
@@ -194,20 +195,22 @@ class Game:
 
             self.window.fill("black")
             
-            try:
-                self.game = self.network.send("get")
-            except:
-                pass
-            
-            if not self.playerReady:
-                self.player.update()
+            if self.mainMenu.gameStart:
+                try:
 
-            if self.game.bothPlayersReady():
-                self.handleBattleSystem()
+                    self.game = self.network.send("get")
+                    if not self.playerReady:
+                        self.player.update()
+                    if self.game.bothPlayersReady():
+                        self.handleBattleSystem()
+                    else:
+                        self.handleOverWorld()
+                    self.getPlayer2Data()
+
+                except:
+                    pass
             else:
-                self.handleOverWorld()
-                
-            self.getPlayer2Data()
+                self.mainMenu.update()
 
             self.cardUi.displayFPS()
 
