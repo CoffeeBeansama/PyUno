@@ -11,15 +11,24 @@ class Network:
         self.server = ip_address
         self.port = port
         self.addr = (self.server,self.port)
-        self.player = self.connect()
+        self.connectPlayer()
+        
 
     def getPlayerID(self):
         return self.player
     
+    def connectPlayer(self):
+        self.connected = True
+        self.player = self.connect()
+
+    def disconnectPlayer(self):
+        self.connected = False
+
     def connect(self):
         try:
-            self.client.connect(self.addr)
-            return self.client.recv(4096).decode()
+            if self.connected:
+                self.client.connect(self.addr)
+                return self.client.recv(4096).decode()
         except:
             pass
 

@@ -33,9 +33,6 @@ class MainMenu:
             self.buttonColor = self.black
             self.buttonTextColor = self.white
 
-
-
-
     def update(self):
         title = self.titleFont.render("PyUno",True,self.fontColor)
         titlePos = (245,60)

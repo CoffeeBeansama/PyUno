@@ -23,19 +23,13 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.mainMenu = MainMenu()
-        self.network = Network()
+        
+        
         self.visibleSprites = CameraGroup()
         self.collisionSprites = pg.sprite.Group()
         self.interactableSprites = pg.sprite.Group()
-
-        try:
-            self.playerID = int(self.network.getPlayerID())
-            p1Pos = (175,100)
-            p2Pos = (287,100)
-            self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
-            self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
-        except:
-            pass
+        self.connectToServer()
+        
         
         self.playerReady = False
         self.battleBegin = False
@@ -54,8 +48,19 @@ class Game:
         self.tileSize = 16
         self.createMap()
         
-        pg.display.set_caption(f"Player {str(self.playerID+1)}")
-        
+        pg.display.set_caption("PyUno")
+    
+    def connectToServer(self):
+        self.network = Network()
+        try:
+            self.playerID = int(self.network.getPlayerID())
+            p1Pos = (175,100)
+            p2Pos = (287,100)
+            self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
+            self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
+        except:
+            pass
+
     def createMap(self):
         mapLayouts = {
             MapTiles.Walls: import_csv_layout("Map/wall.csv"),
@@ -163,29 +168,28 @@ class Game:
             else:
                 self.cardUi.renderPlayerWon(thisPlayerWon)
        
-    def handleOverWorld(self):
+    def handleOverWorldData(self):
         self.visibleSprites.custom_draw(self.player)
         self.gameData["Player"] = self.player.data
         self.network.send(str(self.gameData))
+        
 
     def getPlayer2Data(self):
-        try:
-            match self.playerID:
-                case 0:
-                        data = self.game.getPlayerTwoData()
-                        self.player2.handlePlayer2Movement(
-                                data[PlayerData.Position.value],
-                                data[PlayerData.FrameIndex.value],
-                                data[PlayerData.State.value])
-                case 1:
-                        data = self.game.getPlayerOneData()
-                        self.player2.handlePlayer2Movement(
-                                data[PlayerData.Position.value],
-                                data[PlayerData.FrameIndex.value],
-                                data[PlayerData.State.value])
-        except:
-            pass
-
+        
+        match self.playerID:
+            case 0:
+                    data = self.game.getPlayerTwoData()
+                    self.player2.handlePlayer2Movement(
+                            data[PlayerData.Position.value],
+                            data[PlayerData.FrameIndex.value],
+                            data[PlayerData.State.value])
+            case 1:
+                    data = self.game.getPlayerOneData()
+                    self.player2.handlePlayer2Movement(
+                            data[PlayerData.Position.value],
+                            data[PlayerData.FrameIndex.value],
+                            data[PlayerData.State.value])
+       
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -196,19 +200,24 @@ class Game:
             self.window.fill("black")
             
             if self.mainMenu.gameStart:
+                if not self.playerReady:
+                    self.player.update()
                 try:
-
                     self.game = self.network.send("get")
-                    if not self.playerReady:
-                        self.player.update()
+    
                     if self.game.bothPlayersReady():
                         self.handleBattleSystem()
                     else:
-                        self.handleOverWorld()
+                        self.handleOverWorldData()
+                        
                     self.getPlayer2Data()
 
                 except:
-                    pass
+                    self.network.disconnectPlayer()
+                    self.playerReady = False
+                    self.player.update()
+                    self.visibleSprites.custom_draw(self.player)
+
             else:
                 self.mainMenu.update()
 
