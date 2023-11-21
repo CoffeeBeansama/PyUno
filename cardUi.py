@@ -16,7 +16,6 @@ class CardUi:
 
         self.fontColor = (255,255,255)
         fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
-        self.fpsFont = pg.font.Font(fontPath,18)
         self.gameFont = pg.font.Font(fontPath,64)
 
         self.cardsSize = (80,120)
@@ -102,11 +101,7 @@ class CardUi:
     def getWildCards(self,color):
         for sprites in self.wildCards:
             self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
-            
-    def displayFPS(self):
-         fps = self.fpsFont.render(f"{round(self.clock.get_fps())}",True,self.fontColor)
-         pos = (670,10)
-         self.screen.blit(fps,pos)
+        
 
 
     def displayCards(self):

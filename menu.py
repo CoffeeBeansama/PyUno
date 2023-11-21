@@ -1,9 +1,10 @@
 import pygame as pg
+from scene import Scene
 
-class MainMenu:
-    def __init__(self):
+class MainMenu(Scene):
+    def __init__(self,stateCache,game):
+        super().__init__(stateCache,game)
         pg.font.init()
-        self.screen = pg.display.get_surface()
 
         self.black = (0,0,0)
         self.white = (255,255,255)
@@ -28,12 +29,12 @@ class MainMenu:
             self.buttonColor = self.white
             self.buttonTextColor = self.black
             if mousePressed[0]:
-                self.gameStart = True
+                self.switchScene(self.sceneCache.overWorld())
         else:
             self.buttonColor = self.black
             self.buttonTextColor = self.white
 
-    def update(self):
+    def update(self,game=None):
         title = self.titleFont.render("PyUno",True,self.fontColor)
         titlePos = (245,60)
 

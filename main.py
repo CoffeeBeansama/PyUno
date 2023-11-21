@@ -1,195 +1,48 @@
 import pygame as pg
 from network import Network
 import ast
-from player import Player
-from camera import CameraGroup
-from support import *
-from tile import Tile
-from interactables import *
 from settings import *
-from cardUi import CardUi
-from colorUi import ColorUi
-from unoUi import UnoUi
-from menu import MainMenu
+from sceneCache import SceneCache
+
 
 class Game:
     def __init__(self):
-
+        
         self.window = pg.display.set_mode((width,height))
         
-
         self.running = True
         self.FPS = 60
         self.clock = pg.time.Clock()
 
-        self.mainMenu = MainMenu()
-        
-        
-        self.visibleSprites = CameraGroup()
-        self.collisionSprites = pg.sprite.Group()
-        self.interactableSprites = pg.sprite.Group()
-        self.connectToServer()
-        
-        
-        self.playerReady = False
-        self.battleBegin = False
-
-       
-
-        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
-        self.colorUi = ColorUi(self.setColor)
-        self.unoUi = UnoUi(self.calledUno)
 
         self.gameData = {
             "Player" : {},
             "PlayerTurn" : None
         }
+        
+        self.connectToServer()
+        
+        self.sceneCache = SceneCache(self)
+        self.currentScene = self.sceneCache.mainMenu()
 
-        self.tileSize = 16
-        self.createMap()
+        fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
+        self.fontColor = (255,255,255)
+        self.fpsFont = pg.font.Font(fontPath,18)
         
         pg.display.set_caption("PyUno")
-    
+
     def connectToServer(self):
         self.network = Network()
         try:
             self.playerID = int(self.network.getPlayerID())
-            p1Pos = (175,100)
-            p2Pos = (287,100)
-            self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
-            self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         except:
             pass
 
-    def createMap(self):
-        mapLayouts = {
-            MapTiles.Walls: import_csv_layout("Map/wall.csv"),
-            MapTiles.InteractableObjects: import_csv_layout("Map/interactableObjects.csv")    
-        }
+    def displayFPS(self):
+         fps = self.fpsFont.render(f"{round(self.clock.get_fps())}",True,self.fontColor)
+         pos = (670,10)
+         self.window.blit(fps,pos)
 
-        for style,layout in mapLayouts.items():
-            for rowIndex,row in enumerate(layout):
-                for columnIndex,column in enumerate(row):
-                    if column != "-1":
-                        x = columnIndex * self.tileSize
-                        y = rowIndex * self.tileSize
-
-                        if style == MapTiles.Walls:
-                            Tile((x,y),[self.collisionSprites])
-
-                        if style == MapTiles.InteractableObjects:
-                            if column == "chair":
-                                Chair((x,y),self.interactableSprites,self.playerIn)
-
-
-    def setColor(self,color):
-        self.game = self.network.send(color)
-     
-    def playerIn(self):
-        self.playerReady = True
-        self.game = self.network.send("Ready")
-        if self.game.bothPlayersReady():
-            self.battleBegin = True
-            return
-    
-    def drawSingleCard(self):
-        if self.game.getCurrentTurn() == self.playerID:
-            if self.game.getCurrentDrawStreak() <= 0:
-                self.game = self.network.send("Draw Single Card")
-            else:
-                self.game = self.network.send("Draw Multiple Cards")
-
-    def playerTurn(self,color,value):
-        if self.game.getCurrentTurn() == self.playerID:
-            
-            if self.game.getCurrentDrawStreak() <= 0:
-                isSameAttribute = self.game.getCurrentPileCard()[CardData.Value.value] == value or self.game.getCurrentPileCard()[CardData.Color.value] == color or color == self.game.getCurrrentColor()
-
-                if isSameAttribute:
-                    self.sendUiEvent(value,color)
-
-                elif value == "Wild":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.gameData))
-                    self.colorUi.renderColours = True
-                    self.sendUiEvent(value,color)
-                
-            else:
-                if value == "Draw":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send("Plus Two")
-                    self.game = self.network.send(str(self.gameData))
-                    
-
-            if value == "WildDraw":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send("Plus Four")
-                    self.game = self.network.send(str(self.gameData))
-                    self.colorUi.renderColours = True
-                    self.sendUiEvent(value,color)
-            
-        
-    def sendUiEvent(self,value,color):
-        if value == "Draw":
-            self.gameData["PlayerTurn"] = (value,color)
-            self.game = self.network.send("Plus Two")
-            self.game = self.network.send(str(self.gameData))
-        else:
-            self.gameData["PlayerTurn"] = (value,color)
-            self.game = self.network.send(str(self.gameData))
-
-    def checkPlayerUno(self):
-        player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
-        player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
-        
-        if player1DeckSize == 1 or player2DeckSize == 1:
-            return True
-        
-        return False
-
-    def calledUno(self):
-        self.game = self.network.send("Called Uno")
-    
-    def handleBattleSystem(self):
-        self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
-        self.cardUi.handleUiEvent()
-
-        self.colorUi.drawColours()
-        self.colorUi.handleUiEvent()
-                
-        if self.checkPlayerUno():
-            if not self.game.gameUno():
-                self.unoUi.renderUno()
-
-        if self.game.playerWon() is not None:
-            thisPlayerWon = self.game.playerWon() == self.playerID
-            if thisPlayerWon:
-                self.cardUi.renderPlayerWon(thisPlayerWon)
-            else:
-                self.cardUi.renderPlayerWon(thisPlayerWon)
-       
-    def handleOverWorldData(self):
-        self.visibleSprites.custom_draw(self.player)
-        self.gameData["Player"] = self.player.data
-        self.network.send(str(self.gameData))
-        
-
-    def getPlayer2Data(self):
-        
-        match self.playerID:
-            case 0:
-                    data = self.game.getPlayerTwoData()
-                    self.player2.handlePlayer2Movement(
-                            data[PlayerData.Position.value],
-                            data[PlayerData.FrameIndex.value],
-                            data[PlayerData.State.value])
-            case 1:
-                    data = self.game.getPlayerOneData()
-                    self.player2.handlePlayer2Movement(
-                            data[PlayerData.Position.value],
-                            data[PlayerData.FrameIndex.value],
-                            data[PlayerData.State.value])
-       
     def run(self):
         while self.running:
             for event in pg.event.get():
@@ -199,30 +52,13 @@ class Game:
 
             self.window.fill("black")
             
-            if self.mainMenu.gameStart:
-                if not self.playerReady:
-                    self.player.update()
-                try:
-                    self.game = self.network.send("get")
-    
-                    if self.game.bothPlayersReady():
-                        self.handleBattleSystem()
-                    else:
-                        self.handleOverWorldData()
-                        
-                    self.getPlayer2Data()
-
-                except:
-                    self.network.disconnectPlayer()
-                    self.playerReady = False
-                    self.player.update()
-                    self.visibleSprites.custom_draw(self.player)
-
-            else:
-                self.mainMenu.update()
-
-            self.cardUi.displayFPS()
-
+            try:
+                self.game = self.network.send("get")
+                self.currentScene.update(self.game)
+            except:
+                pass
+            
+            self.displayFPS()
             pg.display.update()
             self.clock.tick(self.FPS)
 

@@ -13,7 +13,7 @@ class InteractableObjects(pg.sprite.Sprite):
 
 
 class Chair(InteractableObjects):
-    def __init__(self,pos,groups,playerIn):
+    def __init__(self,pos,groups):
         super().__init__(groups)
         
         self.image = pg.image.load("Sprites/player.png")
@@ -22,8 +22,6 @@ class Chair(InteractableObjects):
         self.interactHitbox = self.rect.inflate(0,0)
         self.interacted = False
 
-        self.playerIn = playerIn
-    
     def interact(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_x]:

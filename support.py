@@ -30,8 +30,6 @@ def import_folder(path):
 
 
 
-
-    return surface_list
 def loadSprite(imagePath, scale):
     newImage = pg.transform.scale(pg.image.load(imagePath),scale)
     return newImage
