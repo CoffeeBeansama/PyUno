@@ -6,9 +6,10 @@ from settings import CardData
 from scene import Scene
 
 class GameTable(Scene):
-    def __init__(self,stateCache,clock,gameData,network,playerID):
+    def __init__(self,sceneCache,clock,gameData,network,playerID):
         self.screen = pg.display.get_surface()
-
+        
+        self.sceneCache = sceneCache
         self.network = network
         self.playerID = playerID
         self.clock = clock
@@ -24,12 +25,7 @@ class GameTable(Scene):
     def setColor(self,color):
         self.game = self.network.send(color)
     
-    def playerIn(self):
-        self.playerReady = True
-        self.game = self.network.send("Ready")
-        if self.game.bothPlayersReady():
-            self.battleBegin = True
-            return
+   
     
     def drawSingleCard(self):
         if self.game.getCurrentTurn() == self.playerID:
@@ -52,14 +48,12 @@ class GameTable(Scene):
                     self.game = self.network.send(str(self.gameData))
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
-                
             else:
                 if value == "Draw":
                     self.gameData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Two")
                     self.game = self.network.send(str(self.gameData))
                     
-
             if value == "WildDraw":
                     self.gameData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Four")
@@ -79,10 +73,8 @@ class GameTable(Scene):
     def checkPlayerUno(self):
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
         player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
-        
         if player1DeckSize == 1 or player2DeckSize == 1:
             return True
-        
         return False
     
     def calledUno(self):
@@ -91,6 +83,7 @@ class GameTable(Scene):
     
     def update(self,game):
         self.game = game
+        print("update")
         self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
         self.cardUi.handleUiEvent()
 

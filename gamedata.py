@@ -104,6 +104,7 @@ class Game:
     def bothPlayersReady(self):
         if self.playersReady[0] and self.playersReady[1]:
             return True
+            
         return False
 #endregion
 

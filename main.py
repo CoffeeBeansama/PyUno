@@ -55,7 +55,9 @@ class Game:
             try:
                 self.game = self.network.send("get")
                 self.currentScene.update(self.game)
-            except:
+                print(self.currentScene)
+            except Exception as error:
+                #print(error)
                 pass
             
             self.displayFPS()

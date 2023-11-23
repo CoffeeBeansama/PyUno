@@ -4,15 +4,15 @@ from scene import Scene
 class MainMenu(Scene):
     def __init__(self,stateCache,game):
         super().__init__(stateCache,game)
-        pg.font.init()
+        
 
         self.black = (0,0,0)
         self.white = (255,255,255)
 
         self.fontColor = self.white
-        fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
-        self.titleFont = pg.font.Font(fontPath,88)
-        self.buttonFont = pg.font.Font(fontPath,36)
+        
+        self.titleFont = pg.font.Font(self.fontPath,88)
+        self.buttonFont = pg.font.Font(self.fontPath,36)
         self.gameStart = False
 
         self.buttonTextColor = self.white
