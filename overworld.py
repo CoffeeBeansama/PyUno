@@ -10,10 +10,10 @@ from scene import Scene
 
 
 class OverWorld(Scene):
-    def __init__(self,sceneCache,game,gamedata,network,playerID):
+    def __init__(self,sceneCache,game,playerData,network,playerID):
         super().__init__(sceneCache,game)
-        self.sceneCache =  sceneCache
-        self.gameData = gamedata
+
+        self.playerData = playerData
         self.network = network
         self.playerID = playerID
         self.visibleSprites = CameraGroup()
@@ -65,13 +65,13 @@ class OverWorld(Scene):
     def getPlayer2Movement(self):
         match self.playerID:
             case 0:
-                    data = self.game.getPlayerTwoData()
+                    data = self.gameData.getPlayerTwoData()
                     self.player2.handlePlayer2Movement(
                             data[PlayerData.Position.value],
                             data[PlayerData.FrameIndex.value],
                             data[PlayerData.State.value])
             case 1:
-                    data = self.game.getPlayerOneData()
+                    data = self.gameData.getPlayerOneData()
                     self.player2.handlePlayer2Movement(
                             data[PlayerData.Position.value],
                             data[PlayerData.FrameIndex.value],
@@ -104,21 +104,24 @@ class OverWorld(Scene):
          self.screen.blit(ready,(560,432))
          
 
-    def update(self,game):
-        self.game = game
+    def update(self,gameData):
+        self.gameData = gameData
+        
+        if self.gameData.bothPlayersReady():
+            self.switchScene(self.sceneCache.gameTable())
+            return
+        
         self.player.update()
+        
         self.visibleSprites.custom_draw(self.player)
         self.renderReadyButton()
         self.handleEvent()
         
+        self.playerData["Player"] = self.player.data
+        self.network.send(str(self.playerData))
+        self.getPlayer2Movement()
 
         
             
-
-        self.gameData["Player"] = self.player.data
-        self.network.send(str(self.gameData))
-        self.getPlayer2Movement()
-
-        if self.game.bothPlayersReady():
-            self.switchScene(self.sceneCache.gameTable())
+        
             

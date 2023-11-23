@@ -15,7 +15,7 @@ class Game:
         self.clock = pg.time.Clock()
 
 
-        self.gameData = {
+        self.playerData = {
             "Player" : {},
             "PlayerTurn" : None
         }

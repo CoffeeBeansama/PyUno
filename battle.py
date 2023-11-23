@@ -6,26 +6,25 @@ from settings import CardData
 from scene import Scene
 
 class GameTable(Scene):
-    def __init__(self,sceneCache,clock,gameData,network,playerID):
-        self.screen = pg.display.get_surface()
+    def __init__(self,sceneCache,game,playerData,network,playerID):
+        super().__init__(sceneCache,game)
         
         self.sceneCache = sceneCache
         self.network = network
         self.playerID = playerID
-        self.clock = clock
-        self.gameData = gameData
+        
+        self.playerData = playerData
 
         self.playerReady = False
         self.battleBegin = False
 
-        self.cardUi = CardUi(self.clock,self.playerID,self.playerTurn,self.drawSingleCard)
+        self.cardUi = CardUi(self.playerID,self.playerTurn,self.drawSingleCard)
         self.colorUi = ColorUi(self.setColor)
         self.unoUi = UnoUi(self.calledUno)
 
     def setColor(self,color):
         self.game = self.network.send(color)
     
-   
     
     def drawSingleCard(self):
         if self.game.getCurrentTurn() == self.playerID:
@@ -44,31 +43,31 @@ class GameTable(Scene):
                     self.sendUiEvent(value,color)
 
                 elif value == "Wild":
-                    self.gameData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.gameData))
+                    self.playerData["PlayerTurn"] = (value,color)
+                    self.game = self.network.send(str(self.playerData))
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
             else:
                 if value == "Draw":
-                    self.gameData["PlayerTurn"] = (value,color)
+                    self.playerData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Two")
-                    self.game = self.network.send(str(self.gameData))
+                    self.game = self.network.send(str(self.playerData))
                     
             if value == "WildDraw":
-                    self.gameData["PlayerTurn"] = (value,color)
+                    self.playerData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Four")
-                    self.game = self.network.send(str(self.gameData))
+                    self.game = self.network.send(str(self.playerData))
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
 
     def sendUiEvent(self,value,color):
         if value == "Draw":
-            self.gameData["PlayerTurn"] = (value,color)
+            self.playerData["PlayerTurn"] = (value,color)
             self.game = self.network.send("Plus Two")
-            self.game = self.network.send(str(self.gameData))
+            self.game = self.network.send(str(self.playerData))
         else:
-            self.gameData["PlayerTurn"] = (value,color)
-            self.game = self.network.send(str(self.gameData))
+            self.playerData["PlayerTurn"] = (value,color)
+            self.game = self.network.send(str(self.playerData))
     
     def checkPlayerUno(self):
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
@@ -82,8 +81,8 @@ class GameTable(Scene):
     
     
     def update(self,game):
+        
         self.game = game
-        print("update")
         self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
         self.cardUi.handleUiEvent()
 

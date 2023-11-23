@@ -1,7 +1,7 @@
 from enum import Enum
 
 width,height = 700,500
-port = 5557
+port = 5559
 
 
 class CardData(Enum):

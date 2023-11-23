@@ -4,11 +4,10 @@ from settings import *
 from timer import Timer
 
 class CardUi:
-    def __init__(self,clock,playerID,playerTurn,drawSingleCard):
+    def __init__(self,playerID,playerTurn,drawSingleCard):
         self.screen = pg.display.get_surface()
         pg.font.init()
 
-        self.clock = clock
         self.playerID = playerID
         self.playerTurn = playerTurn
         self.drawSingleCard = drawSingleCard

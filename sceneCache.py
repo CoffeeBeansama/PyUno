@@ -10,10 +10,11 @@ class SceneCache:
         self.scenes = {
             "Main Menu" : MainMenu(self,self.game),
             "Lobby" : Lobby(self,self.game),
-            "OverWorld" : OverWorld(self,self.game,self.game.gameData,self.game.network,self.game.playerID),
-            "Game" : GameTable(self,self.game.clock,self.game.gameData,self.game.network,self.game.playerID)
+            "Game" : GameTable(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
+            "OverWorld" : OverWorld(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
         }
 
+        
 
     def mainMenu(self):
         return self.scenes["Main Menu"]

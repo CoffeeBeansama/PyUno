@@ -6,7 +6,7 @@ class Scene(ABC):
         pg.font.init()
         self.screen = pg.display.get_surface()
         self.sceneCache = sceneCache
-        self.game = game
+        self.main = game
         self.fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
 
     @abstractmethod
@@ -14,4 +14,4 @@ class Scene(ABC):
         pass
 
     def switchScene(self,newScene):
-        self.game.currentScene = newScene
+        self.main.currentScene = newScene

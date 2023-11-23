@@ -34,7 +34,7 @@ class MainMenu(Scene):
             self.buttonColor = self.black
             self.buttonTextColor = self.white
 
-    def update(self,game=None):
+    def update(self,gameData=None):
         title = self.titleFont.render("PyUno",True,self.fontColor)
         titlePos = (245,60)
 
