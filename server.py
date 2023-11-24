@@ -35,15 +35,14 @@ class Server:
         self._socket.listen()
         print("Waiting for connection...Server started!")
 
-    def threadedClient(self,conn,player,gameId):
+    def threadedClient(self,conn,player,playerID):
         conn.send(str.encode(str(player)))
 
-        reply = ""
         while True:
             try:
                 data = conn.recv(4096).decode()
-                if gameId in self.games:
-                    game = self.games[gameId]
+                if playerID in self.games:
+                    game = self.games[playerID]
                     if not data:
                         break
                     else:
@@ -51,24 +50,18 @@ class Server:
                            game.processData(player,data)
                            
                         conn.sendall(pickle.dumps(game))
-                else:
-                    break
-            except:
-                
-                break
-        print("Lost connection")
 
-        try:
-            del self.games[gameId]
-        except:
+                else: break
+            except: break
+                
+        try: 
+            del self.games[playerID]
             
-            pass
-        
+        except: pass
+            
         self.idCount -= 1
         conn.close()
-        
-        print("Connection lost")
-        conn.close()
+  
     
     def run(self):
         while True:

@@ -47,17 +47,17 @@ class Game:
         while self.running:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
+                    self.network.disconnectPlayer()
                     self.running = False
                     pg.quit()
 
             self.window.fill("black")
-            
+        
             try:
                 self.game = self.network.send("get")
                 self.currentScene.update(self.game)
-
-            except Exception as error:
-                #print(error)
+                
+            except:
                 pass
             
             self.displayFPS()

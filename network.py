@@ -25,8 +25,7 @@ class Network:
         self.connected = False
 
     def connect(self):
-        try:
-            if self.connected:
+        try: 
                 self.client.connect(self.addr)
                 return self.client.recv(4096).decode()
         except:
@@ -34,7 +33,9 @@ class Network:
 
     def send(self,data):
         try:
-            self.client.send(str.encode(data))  
-            return pickle.loads(self.client.recv(4096))
+            if self.connected:
+                self.client.send(str.encode(data))  
+                return pickle.loads(self.client.recv(4096))
         except socket.error as e:
+            
             pass
