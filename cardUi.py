@@ -19,8 +19,7 @@ class CardUi:
 
         self.cardsSize = (80,120)
         self.startingCards = 7
-        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height)).convert_alpha()
-        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
+       
         self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize).convert_alpha()
 
         self.playerDeckCards = {}
@@ -141,59 +140,64 @@ class CardUi:
         self.timer.update()
         self.cardSelection(self.mousePos,self.mousePressed)
         self.drawFromPile(self.mousePos,self.mousePressed)
+    
+    def highlightPlayerTurnDeck(self,turn,playerID):
+        white = (255,255,255)
+        if turn == playerID:
+            pg.draw.rect(self.screen,white,(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
+        else:
+             pg.draw.rect(self.screen,white,(self.player2DeckBGX,self.player2DeckBGY,self.deckBGWidth,self.deckBGHeight))
+
+
+    def renderPlayerDeck(self,game):
+        self.currentPileCard = game.getCurrentPileCard()
+        self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
+        playerDeckSize : int = len(game.player1Deck if self.playerID == 0 else game.player2Deck)
+        for i in range(playerDeckSize):
+
+            lenghtDistance = self.playerDeckBG_Rect.y // playerDeckSize
+            lengthIncrement = self.cardDeckWidth // playerDeckSize
+            x = (i * lengthIncrement) + (lengthIncrement - lenghtDistance)
+
+            playerCardColours = game.player1Deck[i][CardData.Color.value] if self.playerID == 0 else game.player2Deck[i][CardData.Color.value]
+            playerCardValues = str(game.player1Deck[i][CardData.Value.value]) if self.playerID == 0 else str(game.player2Deck[i][CardData.Value.value])
                     
+            self.playerDeckCards[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
+                            (x,self.p1DeckPosY))
+
+
+    def renderPlayer2Deck(self,game):
+        player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
+        for j in range(player2DeckSize):
+            lenghtDistance = self.playerDeckBG_Rect.y // player2DeckSize
+            lengthIncrement = self.cardDeckWidth // player2DeckSize
+            x = (j * lengthIncrement) + (lengthIncrement - lenghtDistance)
+
+            self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
 
     def handleRendering(self,game,turn,playerID):
         self.timer.update()
         self.mousePos = pg.mouse.get_pos()
         self.mousePressed = pg.mouse.get_pressed()
 
-        self.screen.blit(self.tableSprite,self.tableSpriteRect)
+    
+        self.highlightPlayerTurnDeck(turn,playerID)
+        self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
+        self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect) 
 
-        if turn == playerID:
-            pg.draw.rect(self.screen,(255,255,255),(self.playerDeckBGX,self.playerDeckBGY,self.deckBGWidth,self.deckBGHeight))
-            self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
-            self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
-        else:
-            pg.draw.rect(self.screen,(255,255,255),(self.player2DeckBGX,self.player2DeckBGY,self.deckBGWidth,self.deckBGHeight))
-            self.screen.blit(self.playerDeckBG,self.playerDeckBG_Rect)
-            self.screen.blit(self.player2DeckBG,self.player2DeckBG_Rect)
-            
-        try:
-            
-            self.currentPileCard = game.getCurrentPileCard()
-            self.screen.blit(self.cardSprites[self.currentPileCard[CardData.Color.value]][str(self.currentPileCard[CardData.Value.value])],(300,190))
-            self.drawCard = self.screen.blit(self.blankCard,(410,190))
+        self.drawCard = self.screen.blit(self.blankCard,(410,190))
 
-            playerDeckSize : int = len(game.player1Deck if self.playerID == 0 else game.player2Deck)
-            for i in range(playerDeckSize):
-
-                lenghtDistance = self.playerDeckBG_Rect.y // playerDeckSize
-                lengthIncrement = self.cardDeckWidth // playerDeckSize
-                x = (i * lengthIncrement) + (lengthIncrement - lenghtDistance)
-
-                playerCardColours = game.player1Deck[i][CardData.Color.value] if self.playerID == 0 else game.player2Deck[i][CardData.Color.value]
-                playerCardValues = str(game.player1Deck[i][CardData.Value.value]) if self.playerID == 0 else str(game.player2Deck[i][CardData.Value.value])
-                    
-                self.playerDeckCards[(playerCardColours,playerCardValues)] = self.screen.blit(self.cardSprites[playerCardColours][playerCardValues],
-                                (x,self.p1DeckPosY))
-                    
-                
-
-            player2DeckSize : int = len(game.player1Deck if self.playerID == 1 else game.player2Deck)
-            for j in range(player2DeckSize):
-
-                lenghtDistance = self.playerDeckBG_Rect.y // player2DeckSize
-                lengthIncrement = self.cardDeckWidth // player2DeckSize
-                x = (j * lengthIncrement) + (lengthIncrement - lenghtDistance)
-
-                self.screen.blit(self.blankCard,(x,self.p2DeckPosY))
-
-            
+        try:        
+            self.renderPlayerDeck(game)
+            self.renderPlayer2Deck(game)
         except:
             pass
                 
-       
+    
+    def update(self,game,turn,playerID):
+        
+        self.handleRendering(game,turn,playerID)
+        self.handleUiEvent()
         
         
         

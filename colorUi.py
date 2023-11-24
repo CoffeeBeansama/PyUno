@@ -47,9 +47,12 @@ class ColorUi:
             green = (0,255,0)
             self.green = pg.draw.rect(self.screen,green,(355,180,self.colorSize,self.colorSize))
 
-
             blue = (0,0,255)
             self.blue = pg.draw.rect(self.screen,blue,(35,180,self.colorSize,self.colorSize))
 
             yellow = (255, 255, 0)
             self.yellow = pg.draw.rect(self.screen,yellow,(515,180,self.colorSize,self.colorSize))
+
+    def update(self):
+        self.drawColours()
+        self.handleUiEvent()

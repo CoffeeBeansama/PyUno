@@ -2,8 +2,9 @@ import pygame as pg
 from cardUi import CardUi
 from colorUi import ColorUi
 from unoUi import UnoUi
-from settings import CardData
+from settings import CardData,width,height
 from scene import Scene
+from support import loadSprite
 
 class GameTable(Scene):
     def __init__(self,sceneCache,game,playerData,network,playerID):
@@ -12,8 +13,10 @@ class GameTable(Scene):
         self.sceneCache = sceneCache
         self.network = network
         self.playerID = playerID
-        
         self.playerData = playerData
+
+        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height)).convert_alpha()
+        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
         self.playerReady = False
         self.battleBegin = False
@@ -21,6 +24,7 @@ class GameTable(Scene):
         self.cardUi = CardUi(self.playerID,self.playerTurn,self.drawSingleCard)
         self.colorUi = ColorUi(self.setColor)
         self.unoUi = UnoUi(self.calledUno)
+        
 
     def setColor(self,color):
         self.game = self.network.send(color)
@@ -33,18 +37,24 @@ class GameTable(Scene):
             else:
                 self.game = self.network.send("Draw Multiple Cards")
 
+    def cardWithSameAttribute(self,value,color):
+        if self.game.getCurrentPileCard()[CardData.Value.value] == value:
+            return True
+        if self.game.getCurrentPileCard()[CardData.Color.value] == color:
+            return True
+        if color == self.game.getCurrrentColor():
+            return True
+        
+        return False
+
     def playerTurn(self,color,value):
         if self.game.getCurrentTurn() == self.playerID:
             
             if self.game.getCurrentDrawStreak() <= 0:
-                isSameAttribute = self.game.getCurrentPileCard()[CardData.Value.value] == value or self.game.getCurrentPileCard()[CardData.Color.value] == color or color == self.game.getCurrrentColor()
-
-                if isSameAttribute:
+                
+                if self.cardWithSameAttribute(value,color):
                     self.sendUiEvent(value,color)
-
-                elif value == "Wild":
-                    self.playerData["PlayerTurn"] = (value,color)
-                    self.game = self.network.send(str(self.playerData))
+                if value == "Wild":
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
             else:
@@ -54,9 +64,7 @@ class GameTable(Scene):
                     self.game = self.network.send(str(self.playerData))
                     
             if value == "WildDraw":
-                    self.playerData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Four")
-                    self.game = self.network.send(str(self.playerData))
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
 
@@ -83,12 +91,12 @@ class GameTable(Scene):
     def update(self,game):
         
         self.game = game
-        self.cardUi.handleRendering(self.game,self.game.getCurrentTurn(),self.playerID)
-        self.cardUi.handleUiEvent()
 
-        self.colorUi.drawColours()
-        self.colorUi.handleUiEvent()
-                
+        self.screen.blit(self.tableSprite,self.tableSpriteRect)
+
+        self.cardUi.update(self.game,self.game.getCurrentTurn(),self.playerID)
+        self.colorUi.update()
+        
         if self.checkPlayerUno():
             if not self.game.gameUno():
                 self.unoUi.renderUno()
