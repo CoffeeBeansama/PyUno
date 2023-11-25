@@ -70,7 +70,6 @@ class Server:
             self.idCount += 1
             player = 0
             gameId = (self.idCount -1) // 2
-
             if self.idCount % 2 == 1:
                 self.games[gameId] = Game(gameId)
             else:

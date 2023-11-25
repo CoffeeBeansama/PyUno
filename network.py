@@ -10,7 +10,8 @@ class Network:
         
         self.server = ip_address
         self.port = port
-        self.addr = (self.server,self.port)
+        self.addr = (self.server,self.port) # this one
+       
         self.connectPlayer()
         
 
