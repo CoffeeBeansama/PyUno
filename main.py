@@ -7,7 +7,7 @@ from sceneCache import SceneCache
 
 class Game:
     def __init__(self):
-        
+        pg.init()
         self.window = pg.display.set_mode((width,height))
         
         self.running = True
@@ -56,7 +56,6 @@ class Game:
             try:
                 self.game = self.network.send("get")
                 self.currentScene.update(self.game)
-                
             except:
                 pass
             

@@ -94,9 +94,9 @@ class GameTable(Scene):
 
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
 
-        self.colorUi.update()
-        self.cardUi.update(self.game,self.game.getCurrentTurn(),self.playerID)
         
+        self.cardUi.update(self.game,self.game.getCurrentTurn(),self.playerID)
+        self.colorUi.update()
         
         if self.checkPlayerUno():
             if not self.game.gameUno():

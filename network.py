@@ -7,11 +7,9 @@ class Network:
         self.client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
-        
         self.server = ip_address
         self.port = port
         self.addr = (self.server,self.port) # this one
-       
         self.connectPlayer()
         
 
@@ -21,14 +19,15 @@ class Network:
     def connectPlayer(self):
         self.connected = True
         self.player = self.connect()
+       
 
     def disconnectPlayer(self):
         self.connected = False
 
     def connect(self):
         try: 
-                self.client.connect(self.addr)
-                return self.client.recv(4096).decode()
+            self.client.connect(self.addr)
+            return self.client.recv(4096).decode()
         except:
             pass
 
