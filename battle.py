@@ -8,15 +8,11 @@ from support import loadSprite
 
 class GameTable(Scene):
     def __init__(self,sceneCache,game,playerData,network,playerID):
-        super().__init__(sceneCache,game)
-        
+        super().__init__(sceneCache,game)        
         self.sceneCache = sceneCache
         self.network = network
         self.playerID = playerID
         self.playerData = playerData
-
-        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height)).convert_alpha()
-        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
         self.playerReady = False
         self.battleBegin = False
@@ -24,7 +20,12 @@ class GameTable(Scene):
         self.cardUi = CardUi(self.playerID,self.playerTurn,self.drawSingleCard)
         self.colorUi = ColorUi(self.setColor)
         self.unoUi = UnoUi(self.calledUno)
-        
+
+        self.initializeBackgroundImage()
+    
+    def initializeBackgroundImage(self):
+        self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height)).convert_alpha()
+        self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
     def setColor(self,color):
         self.game = self.network.send(color)
@@ -44,14 +45,11 @@ class GameTable(Scene):
             return True
         if color == self.game.getCurrrentColor():
             return True
-        
         return False
 
     def playerTurn(self,color,value):
         if self.game.getCurrentTurn() == self.playerID:
-            
             if self.game.getCurrentDrawStreak() <= 0:
-                
                 if self.cardWithSameAttribute(value,color):
                     self.sendUiEvent(value,color)
                 if value == "Wild":
@@ -88,13 +86,11 @@ class GameTable(Scene):
         self.game = self.network.send("Called Uno")
     
     
-    def update(self,game):
-        
+    def update(self,game):        
         self.game = game
 
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
 
-        
         self.cardUi.update(self.game,self.game.getCurrentTurn(),self.playerID)
         self.colorUi.update()
         
@@ -107,4 +103,4 @@ class GameTable(Scene):
             if thisPlayerWon:
                 self.cardUi.renderPlayerWon(thisPlayerWon)
             else:
-                self.cardUi.renderPlayerWon(thisPlayerWon)
+                self.cardUi.renderPlayerWon(thisPlayerWoin)

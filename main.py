@@ -1,9 +1,10 @@
+import sys
 import pygame as pg
 from network import Network
 import ast
 from settings import *
 from sceneCache import SceneCache
-
+from eventhandler import EventHandler
 
 class Game:
     def __init__(self):
@@ -30,7 +31,7 @@ class Game:
         self.fpsFont = pg.font.Font(fontPath,18)
         
         pg.display.set_caption("PyUno")
-
+    
     def connectToServer(self):
         self.network = Network()
         try:
@@ -50,9 +51,11 @@ class Game:
                     self.network.disconnectPlayer()
                     self.running = False
                     pg.quit()
+                    sys.exit()
 
             self.window.fill("black")
-        
+            EventHandler.handleKeyBoardInput() 
+
             try:
                 self.game = self.network.send("get")
                 self.currentScene.update(self.game)
@@ -65,6 +68,6 @@ class Game:
 
 
 
-
-game = Game()
-game.run()
+if __name__ == "__main__":
+    game = Game()
+    game.run()

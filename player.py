@@ -1,7 +1,7 @@
 import pygame as pg
 from support import loadSprite,import_folder
 from settings import PlayerData
-
+from eventhandler import EventHandler
 
 class Player(pg.sprite.Sprite):
     def __init__(self,id,pos,groups,collisionSprites,interactables):
@@ -10,7 +10,6 @@ class Player(pg.sprite.Sprite):
         self.id = id
         self.collisionSprites = collisionSprites
         self.interactableSprites = interactables
-        self.spritePath = f"Sprites/Player{1}/" if self.id == 0 else f"Sprites/Player{2}/"
 
         self.importSprites()
         self.image = pg.image.load(f"{self.spritePath}Idle_Down/180.png").convert_alpha()
@@ -32,6 +31,8 @@ class Player(pg.sprite.Sprite):
             "Idle_Down": [],"Idle_Up": [], "Idle_Left": [] , "Idle_Right": [],
             
         }
+
+        self.spritePath = f"Sprites/Player{1}/" if self.id == 0 else f"Sprites/Player{2}/"
 
         for animations in self.animationStates.keys():
             fullPath = self.spritePath + animations
@@ -59,7 +60,7 @@ class Player(pg.sprite.Sprite):
         if self.frame_index >= len(animation):
             self.frame_index = 0
         
-        self.image = animation[int(self.frame_index)].convert_alpha()
+        self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.hitbox.center)
         
 
@@ -95,15 +96,13 @@ class Player(pg.sprite.Sprite):
                         self.hitbox.bottom = sprite.hitbox.top
 
     def handleInputs(self):
-        keys = pg.key.get_pressed()
-
-        if keys[pg.K_w]:
+        if EventHandler.pressingUpKey():
             self.handleVerticalMovement(-1,"Up")
-        elif keys[pg.K_s]:
+        elif EventHandler.pressingDownKey():
             self.handleVerticalMovement(1,"Down")
-        elif keys[pg.K_a]:
+        elif EventHandler.pressingLeftKey():
             self.handleHorizontalMovement(-1,"Left")
-        elif keys[pg.K_d]:
+        elif EventHandler.pressingRightKey():
             self.handleHorizontalMovement(1,"Right")
         else:
             self.idleState()
@@ -113,7 +112,7 @@ class Player(pg.sprite.Sprite):
         self.rect.center = pos
         self.state = state
         self.frame_index = frameIndex
-        self.image : pg.Surface = self.animationStates[self.state][int(self.frame_index)].convert_alpha()
+        self.image : pg.Surface = self.animationStates[self.state][int(self.frame_index)]
 
     def update(self):
         self.data[PlayerData.Position.value] = self.rect.center

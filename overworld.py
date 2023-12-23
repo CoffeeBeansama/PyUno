@@ -12,39 +12,46 @@ from scene import Scene
 class OverWorld(Scene):
     def __init__(self,sceneCache,game,playerData,network,playerID):
         super().__init__(sceneCache,game)
-
         self.playerData = playerData
         self.network = network
         self.playerID = playerID
+
         self.visibleSprites = CameraGroup()
         self.collisionSprites = pg.sprite.Group()
         self.interactableSprites = pg.sprite.Group()
 
-        self.tileSize = 16
         self.createMap()
 
+        self.initializeButtonColours()
+
+        self.font = pg.font.Font(self.fontPath,36)
+        self.fontColor = self.black
+
+        self.playerReady = False
+
+        self.createPlayers()
+    
+    def initializeButtonColours(self):
         self.black = (0,0,0)
         self.white = (255,255,255)
         self.yellow = (255,0,0)
 
         self.buttonColor = self.black
 
-        self.font = pg.font.Font(self.fontPath,36)
-        self.fontColor = self.black
-
+    def createPlayers(self):
         p1Pos = (175,100)
         p2Pos = (287,100)
         self.player = Player(self.playerID,p1Pos if self.playerID == 0  else p2Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
         self.player2 = Player(self.playerID+1 if self.playerID == 0 else 0,p2Pos if self.playerID == 0 else p1Pos,self.visibleSprites,self.collisionSprites,self.interactableSprites)
-        
-        self.playerReady = False
-
 
     def createMap(self):
         mapLayouts = {
             MapTiles.Walls: import_csv_layout("Map/wall.csv"),
             MapTiles.InteractableObjects: import_csv_layout("Map/interactableObjects.csv")    
         }
+
+        self.tileSize = 16
+
         for style,layout in mapLayouts.items():
             for rowIndex,row in enumerate(layout):
                 for columnIndex,column in enumerate(row):

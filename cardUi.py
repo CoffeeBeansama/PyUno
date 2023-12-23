@@ -6,72 +6,54 @@ from timer import Timer
 class CardUi:
     def __init__(self,playerID,playerTurn,drawSingleCard):
         self.screen = pg.display.get_surface()
-        pg.font.init()
-
         self.playerID = playerID
         self.playerTurn = playerTurn
         self.drawSingleCard = drawSingleCard
     
-
-        self.fontColor = (255,255,255)
-        fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
-        self.gameFont = pg.font.Font(fontPath,64)
-
-        self.cardsSize = (80,120)
-        self.startingCards = 7
+        self.initializeFont()
        
-        self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardsSize).convert_alpha()
-
-        self.playerDeckCards = {}
-      
-        self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
-        self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
-        self.playerDeckBG.set_alpha(240)
-        
-        self.cardDeckWidth = 625
-        self.p1DeckPosY = 355
-        
-        self.player2DeckBG = self.playerDeckBG
-        self.player2DeckBG_Rect = self.player2DeckBG.get_rect(topleft=(20,10))
-        
-        self.p2DeckPosY = 20
-
-        self.wildCards = ["Wild","WildDraw"]
-        self.colorCards = ["0","1","2","3","4","5","6","7","8","9","Draw","Reverse","Skip"]
-        
-        self.transitionSprite = loadSprite("Sprites/playerDeckBg.png",(width,height)).convert_alpha()
-        self.transitionSpriteRect = self.transitionSprite.get_rect(topleft=(0,0))
-        self.transitionSprite.set_alpha(0)
-        self.transitioned = False
-
-
         self.importCardSprites()
-
-        self.timer = Timer(300)
-
         
         self.renderColours = False
 
-        self.drawCard = self.screen.blit(self.blankCard,(410,190))
+        self.initializePlayerDeck()
+        self.initializePlayerTwoDeck()
 
+        self.deletedCard = None
+        
+        self.timer = Timer(300)
 
-        self.blue = None
-        self.green = None
-        self.red = None
-        self.yellow = None
+    
+    def initializeFont(self):
+        pg.font.init()
+        self.fontColor = (255,255,255)
+        fontPath = "Fonts/DeterminationMonoWebRegular-Z5oq.ttf"
+        self.gameFont = pg.font.Font(fontPath,64)
+   
+    def initializePlayerDeck(self): 
+        self.playerDeckCards = {}
 
-        self.colorSize = 150
+        self.playerDeckBG = loadSprite("Sprites/playerDeckBg.png",(660,150))
+        self.playerDeckBG_Rect = self.playerDeckBG.get_rect(topleft=(20,340))
+        self.playerDeckBG.set_alpha(240)
 
         self.playerDeckBGX = 15
         self.playerDeckBGY = 335
 
+        self.deckBGWidth = 670
+        self.deckBGHeight = 160
+       
+        self.cardDeckWidth = 625
+        self.p1DeckPosY = 355
+    
+    def initializePlayerTwoDeck(self): 
         self.player2DeckBGX = 15
         self.player2DeckBGY = 5
 
-        self.deckBGWidth = 670
-        self.deckBGHeight = 160
-
-        self.deletedCard = None
+        self.player2DeckBG = self.playerDeckBG
+        self.player2DeckBG_Rect = self.player2DeckBG.get_rect(topleft=(20,10))
+        
+        self.p2DeckPosY = 20
 
     def importCardSprites(self):
         self.cardSpritePath = "Sprites/Uno Game Assets/"
@@ -86,19 +68,26 @@ class CardUi:
             "WildCards": {}
         }
 
+        self.colorCards = ["0","1","2","3","4","5","6","7","8","9","Draw","Reverse","Skip"]
+        self.cardSize = (80,120)
+        self.blankCard = loadSprite("Sprites/Uno Game Assets/Deck.png",self.cardSize).convert_alpha()
+        self.drawCard = self.screen.blit(self.blankCard,(410,190))
+        self.wildCards = ["Wild","WildDraw"]
+
         self.getColorCards("Blue")
         self.getColorCards("Red")
         self.getColorCards("Yellow")
         self.getColorCards("Green")
         self.getWildCards("WildCards")
 
+
     def getColorCards(self,color):
         for sprites in self.colorCards:
-            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",(80,120)).convert_alpha()
+            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{color}_{sprites}.png",self.cardSize).convert_alpha()
             
     def getWildCards(self,color):
         for sprites in self.wildCards:
-            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",(80,120)).convert_alpha()
+            self.cardSprites[color][sprites] = loadSprite(f"{self.cardSpritePath}{color}/{sprites}.png",self.cardSize).convert_alpha()
         
 
 
