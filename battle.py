@@ -5,6 +5,7 @@ from unoUi import UnoUi
 from settings import CardData,width,height
 from scene import Scene
 from support import loadSprite
+from timer import Timer
 
 class GameTable(Scene):
     def __init__(self,sceneCache,game,playerData,network,playerID):
@@ -22,15 +23,26 @@ class GameTable(Scene):
         self.unoUi = UnoUi(self.calledUno)
 
         self.initializeBackgroundImage()
+        
+        self.initializeVisualEffect()
+
     
     def initializeBackgroundImage(self):
         self.tableSprite = loadSprite("Sprites/Uno Game Assets/Table_2.png",(width,height)).convert_alpha()
         self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
+    def initializeVisualEffect(self):
+        self.effectAnimated = False
+        self.circleColor = (255,255,255)
+        self.circlePos = [340,250]
+        self.circleRadius = 0
+        self.circleWidth = 3
+
+        self.effectTimer = Timer(1500)
+
     def setColor(self,color):
         self.game = self.network.send(color)
-    
-    
+        
     def drawSingleCard(self):
         if self.game.getCurrentTurn() == self.playerID:
             if self.game.getCurrentDrawStreak() <= 0:
@@ -60,11 +72,12 @@ class GameTable(Scene):
                     self.playerData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Two")
                     self.game = self.network.send(str(self.playerData))
-                    
+            
             if value == "WildDraw":
                     self.game = self.network.send("Plus Four")
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
+                    
 
     def sendUiEvent(self,value,color):
         if value == "Draw":
@@ -74,7 +87,14 @@ class GameTable(Scene):
         else:
             self.playerData["PlayerTurn"] = (value,color)
             self.game = self.network.send(str(self.playerData))
-    
+
+    def handleVisualEffect(self):
+        if self.game.getCurrentPileCard()[CardData.Value.value] in ["Draw","WildDraw"]:
+            if not self.effectAnimated:
+
+                pg.draw.circle(self.screen,self.circleColor,self.circlePos,self.circleRadius,self.circleWidth)
+
+
     def checkPlayerUno(self):
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
         player2DeckSize : int = len(self.game.player1Deck if self.playerID == 1 else self.game.player2Deck)
@@ -104,3 +124,5 @@ class GameTable(Scene):
                 self.cardUi.renderPlayerWon(thisPlayerWon)
             else:
                 self.cardUi.renderPlayerWon(thisPlayerWoin)
+
+        self.handleVisualEffect()
