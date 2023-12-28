@@ -6,13 +6,16 @@ from battle import GameTable
 class SceneCache:
     def __init__(self,game):
         self.game = game
-
-        self.scenes = {
-            "Main Menu" : MainMenu(self,self.game),
-            "Lobby" : Lobby(self,self.game),
-            "Game" : GameTable(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
-            "OverWorld" : OverWorld(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
-        }
+        
+        try:
+            self.scenes = {
+                "Main Menu" : MainMenu(self,self.game),
+                "Lobby" : Lobby(self,self.game),
+                "Game" : GameTable(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
+                "OverWorld" : OverWorld(self,self.game,self.game.playerData,self.game.network,self.game.playerID),
+            }
+        except:
+            print("Server error: Not connected to the server!")
 
         
 

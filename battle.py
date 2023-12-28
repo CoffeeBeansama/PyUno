@@ -38,7 +38,7 @@ class GameTable(Scene):
         self.circleRadius = 0
         self.circleWidth = 3
 
-        self.effectTimer = Timer(1500)
+        self.effectTimer = Timer(1500,self.resetVisualEffect)
 
     def setColor(self,color):
         self.game = self.network.send(color)
@@ -89,11 +89,19 @@ class GameTable(Scene):
             self.game = self.network.send(str(self.playerData))
 
     def handleVisualEffect(self):
-        if self.game.getCurrentPileCard()[CardData.Value.value] in ["Draw","WildDraw"]:
-            if not self.effectAnimated:
+        if self.game.getCurrentPileCard()[CardData.Value.value] not in ["Draw","WildDraw"]: return
 
-                pg.draw.circle(self.screen,self.circleColor,self.circlePos,self.circleRadius,self.circleWidth)
+        if self.effectAnimated: return
 
+        if not self.effectTimer.activated:
+            self.effectTimer.activate()
+        
+        self.circleRadius += 0.5
+        pg.draw.circle(self.screen,self.circleColor,self.circlePos,self.circleRadius,self.circleWidth)
+    
+    def resetVisualEffect(self):
+        self.circleRadius = 0
+        self.effectAnimated = True
 
     def checkPlayerUno(self):
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
