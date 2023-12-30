@@ -32,11 +32,11 @@ class GameTable(Scene):
         self.tableSpriteRect = self.tableSprite.get_rect(topleft=(0,0))
 
     def initializeVisualEffect(self):
-        self.effectAnimated = False
+        self.effectAnimate = False
         self.circleColor = (255,255,255)
         self.circlePos = [340,250]
         self.circleRadius = 0
-        self.circleWidth = 3
+        self.circleWidth = 13
 
         self.effectTimer = Timer(1500,self.resetVisualEffect)
 
@@ -72,36 +72,39 @@ class GameTable(Scene):
                     self.playerData["PlayerTurn"] = (value,color)
                     self.game = self.network.send("Plus Two")
                     self.game = self.network.send(str(self.playerData))
-            
+                    self.effectAnimate = True
+
             if value == "WildDraw":
                     self.game = self.network.send("Plus Four")
                     self.colorUi.renderColours = True
                     self.sendUiEvent(value,color)
-                    
+                    self.effectAnimate = True
+                
 
     def sendUiEvent(self,value,color):
         if value == "Draw":
             self.playerData["PlayerTurn"] = (value,color)
             self.game = self.network.send("Plus Two")
             self.game = self.network.send(str(self.playerData))
+            self.effectAnimate = True
         else:
             self.playerData["PlayerTurn"] = (value,color)
             self.game = self.network.send(str(self.playerData))
 
     def handleVisualEffect(self):
-        if self.game.getCurrentPileCard()[CardData.Value.value] not in ["Draw","WildDraw"]: return
-
-        if self.effectAnimated: return
+        if not self.effectAnimate: return
 
         if not self.effectTimer.activated:
             self.effectTimer.activate()
         
-        self.circleRadius += 0.5
+        self.circleRadius += 14
         pg.draw.circle(self.screen,self.circleColor,self.circlePos,self.circleRadius,self.circleWidth)
+
+        
     
     def resetVisualEffect(self):
         self.circleRadius = 0
-        self.effectAnimated = True
+        self.effectAnimate = False
 
     def checkPlayerUno(self):
         player1DeckSize : int = len(self.game.player1Deck if self.playerID == 0 else self.game.player2Deck)
@@ -116,7 +119,7 @@ class GameTable(Scene):
     
     def update(self,game):        
         self.game = game
-
+        self.effectTimer.update()
         self.screen.blit(self.tableSprite,self.tableSpriteRect)
 
         self.cardUi.update(self.game,self.game.getCurrentTurn(),self.playerID)
@@ -125,6 +128,7 @@ class GameTable(Scene):
         if self.checkPlayerUno():
             if not self.game.gameUno():
                 self.unoUi.renderUno()
+
 
         if self.game.playerWon() is not None:
             thisPlayerWon = self.game.playerWon() == self.playerID
